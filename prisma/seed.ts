@@ -2,8 +2,8 @@ import { config } from "dotenv";
 
 import { createPopulatedTodo } from "../app/features/todos/infrastructure/todos-factories.server";
 import { saveTodoToDatabase } from "../app/features/todos/infrastructure/todos-model.server";
-import { createPopulatedUser } from "../app/features/users/users-factories.server";
-import { saveUserToDatabase } from "../app/features/users/users-model.server";
+import { createPopulatedUser } from "../app/features/users/infrastructure/users-factories.server";
+import { saveUserToDatabase } from "../app/features/users/infrastructure/users-model.server";
 import { prisma } from "../app/utils/db.server";
 
 config();

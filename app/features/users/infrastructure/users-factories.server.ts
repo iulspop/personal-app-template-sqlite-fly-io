@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { createId } from "@paralleldrive/cuid2";
 
-import type { User } from "../../../generated/prisma/client";
+import type { User } from "../../../../generated/prisma/client";
 import type { Factory } from "~/utils/types";
 
 /**
