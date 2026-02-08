@@ -12,8 +12,6 @@ import {
   buildMagicLinkUrl,
   computeVerificationExpiry,
   isSessionExpired,
-  validateEmail,
-  validateName,
 } from "../domain/auth-domain";
 import { sendMagicLinkEmail } from "../infrastructure/email.server";
 import {
@@ -27,6 +25,10 @@ import {
 } from "../infrastructure/verifications-model.server";
 import { authActionSchema } from "./auth-schemas";
 import { createUserSession } from "./auth-session.server";
+import {
+  validateEmail,
+  validateName,
+} from "~/features/users/domain/users-domain";
 import {
   retrieveUserFromDatabaseByEmail,
   saveUserToDatabase,

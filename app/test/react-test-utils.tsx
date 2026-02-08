@@ -15,6 +15,7 @@ await i18next.use(initReactI18next).init({
     useSuspense: false,
   },
   resources,
+  showSupportNotice: false,
 });
 
 function AllTheProviders({ children }: { children: ReactNode }) {

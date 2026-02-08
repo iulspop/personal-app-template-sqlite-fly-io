@@ -2,11 +2,11 @@ import { useTranslation } from "react-i18next";
 import { Form } from "react-router";
 
 import { ONBOARD_INTENT } from "../domain/auth-constants";
-import type { AuthValidationError } from "../domain/auth-domain";
+import type { UserValidationError } from "~/features/users/domain/users-domain";
 import {
-  authValidationErrorToI18nKey,
-  isAuthValidationError,
-} from "../domain/auth-domain";
+  isUserValidationError,
+  userValidationErrorToI18nKey,
+} from "~/features/users/domain/users-domain";
 
 type OnboardingPageActionData =
   | { error: string; success: false }
@@ -53,10 +53,10 @@ export function OnboardingPageComponent({
         </button>
         {actionData?.success === false && (
           <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-            {isAuthValidationError(actionData.error)
+            {isUserValidationError(actionData.error)
               ? tValidation(
-                  authValidationErrorToI18nKey(
-                    actionData.error as AuthValidationError,
+                  userValidationErrorToI18nKey(
+                    actionData.error as UserValidationError,
                   ),
                 )
               : tValidation(`validation.${actionData.error}` as never)}
