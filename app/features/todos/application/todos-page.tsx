@@ -11,7 +11,7 @@ export function TodosPageComponent({ todos }: { todos: Todo[] }) {
   const counts = countByStatus(todos);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <main className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-8 text-3xl font-bold text-gray-900 dark:text-gray-100">
         {t("pageTitle")}
       </h1>
@@ -61,6 +61,6 @@ export function TodosPageComponent({ todos }: { todos: Todo[] }) {
           </footer>
         </>
       )}
-    </div>
+    </main>
   );
 }

@@ -45,7 +45,7 @@ export function TodoItemComponent({ todo }: { todo: Todo }) {
         <span
           className={
             todo.completed
-              ? "text-gray-400 line-through dark:text-gray-500"
+              ? "text-gray-500 line-through dark:text-gray-400"
               : ""
           }
         >
@@ -62,7 +62,7 @@ export function TodoItemComponent({ todo }: { todo: Todo }) {
         <input name="id" type="hidden" value={todo.id} />
         <button
           aria-label={`Delete ${todo.title}`}
-          className="text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400"
+          className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
           name="intent"
           type="submit"
           value={DELETE_TODO_INTENT}
