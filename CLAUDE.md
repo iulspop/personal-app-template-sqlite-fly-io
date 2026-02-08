@@ -106,6 +106,43 @@ InternationalizationConstraints {
   Use Trans component for interpolation with links/components.
 }
 
+## Hexagonal Feature-Slice Architecture
+
+Each feature lives under `app/features/<name>/` with three subdirectories:
+
+```
+app/features/<name>/
+├── domain/          # Pure types, functions, constants — zero external imports
+├── infrastructure/  # Database facades, test factories — Prisma/DB only
+└── application/     # Actions, schemas, UI components — orchestrates domain + infra
+```
+
+| Layer | Subdirectory | File pattern | Imports allowed | Purpose |
+|-------|-------------|-------------|-----------------|---------|
+| **Domain** | `domain/` | `*-domain.ts` | Zero external imports. Pure TS only | Types + pure functions + result types |
+| **Domain tests** | `domain/` | `*-domain.test.ts` | Vitest + domain file | Unit tests for pure functions |
+| **Constants** | `domain/` | `*-constants.ts` | Nothing | Intent strings, magic values |
+| **Infrastructure** | `infrastructure/` | `*-model.server.ts` | Prisma, `~/utils/db.server` | Database facades (single Prisma op each) |
+| **Factories** | `infrastructure/` | `*-factories.server.ts` | Faker, cuid2, Prisma types | Test data factories |
+| **Application** | `application/` | `*-action.server.ts` | Domain, model, schemas, React Router | Thin adapter: parse form -> domain validate -> infra call |
+| **Schemas** | `application/` | `*-schemas.ts` | `zod`, constants | Validate raw form input (structural) |
+| **UI** | `application/` | `*-page.tsx`, `*.tsx` | Domain (pure helpers), React, RR, i18n | Display/container components |
+| **Route** | `app/routes/*.tsx` | N/A | Feature imports | Thin wiring: loader/action/component |
+
+Import rules:
+- Domain files (`*-domain.ts`) must have **zero imports**
+- Constants files (`*-constants.ts`) must have **zero imports**
+- Schema files import only from `zod` and `../domain/` constants
+- Model files import only from Prisma and `~/utils/db.server`
+- Action files orchestrate: `../domain/` + `../infrastructure/` + local schemas
+- UI files can import `../domain/` pure helpers but never model/action files
+
+Key patterns:
+- One generic `Result<T, E>` replaces per-operation result types
+- SDA function params replace Command objects
+- `ts-pattern` exhaustive matching in action handlers
+- See `app/features/todos/` for a complete reference implementation
+
 ## Facade Functions
 
 FacadeConstraints {

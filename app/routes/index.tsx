@@ -1,13 +1,25 @@
-import { Welcome } from "../welcome/welcome";
 import type { Route } from "./+types/index";
+import { getInstance } from "~/features/localization/i18next-middleware.server";
+import { todosAction } from "~/features/todos/application/todos-action.server";
+import { TodosPageComponent } from "~/features/todos/application/todos-page";
+import { retrieveAllTodosFromDatabase } from "~/features/todos/infrastructure/todos-model.server";
 
-export function meta(_args: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { content: "Welcome to React Router!", name: "description" },
-  ];
+export async function loader({ context }: Route.LoaderArgs) {
+  const i18n = getInstance(context);
+  return {
+    pageTitle: i18n.t("todos:pageTitle"),
+    todos: await retrieveAllTodosFromDatabase(),
+  };
 }
 
-export default function Home() {
-  return <Welcome />;
+export const meta: Route.MetaFunction = ({ loaderData }) => [
+  { title: loaderData?.pageTitle },
+];
+
+export async function action(args: Route.ActionArgs) {
+  return await todosAction(args);
+}
+
+export default function TodosRoute({ loaderData }: Route.ComponentProps) {
+  return <TodosPageComponent todos={loaderData.todos} />;
 }
