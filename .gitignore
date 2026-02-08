@@ -13,3 +13,6 @@ prisma/*.db-journal
 
 # Test
 /coverage/
+/playwright-report/
+/blob-report/
+/test-results/
