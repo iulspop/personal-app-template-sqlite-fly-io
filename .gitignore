@@ -10,3 +10,6 @@ prisma/*.db-journal
 # React Router
 /.react-router/
 /build/
+
+# Test
+/coverage/

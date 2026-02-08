@@ -16,17 +16,23 @@
     "@commitlint/config-conventional": "^20.4.1",
     "@react-router/dev": "7.12.0",
     "@tailwindcss/vite": "^4.1.13",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.0.18",
+    "happy-dom": "^20.5.0",
     "lefthook": "^1.11.13",
     "prisma": "^7.3.0",
     "react-router-auto-routes": "^0.7.1",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.18"
   },
   "name": "personal-app-template-sqlite-fly-io",
   "packageManager": "pnpm@10.28.2",
@@ -51,6 +57,8 @@
     "lint": "biome ci --css-parse-tailwind-directives=true .",
     "prepare": "lefthook install",
     "start": "react-router-serve ./build/server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "react-router typegen && tsc"
   },
   "type": "module"

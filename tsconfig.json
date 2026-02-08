@@ -15,7 +15,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
-    "types": ["node", "vite/client"],
+    "types": ["@testing-library/jest-dom", "node", "vite/client"],
     "verbatimModuleSyntax": true
   },
   "include": [
