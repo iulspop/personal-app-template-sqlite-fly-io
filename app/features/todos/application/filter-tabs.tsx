@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import type { TodoFilter } from "../domain/todos-domain";
+import { cn } from "~/lib/utils";
 
 const filters: TodoFilter[] = ["all", "active", "completed"];
 
@@ -17,11 +18,12 @@ export function FilterTabsComponent({
       {filters.map((filter) => (
         <Link
           aria-current={filter === currentFilter ? "page" : undefined}
-          className={`rounded-lg px-3 py-1 text-sm ${
+          className={cn(
+            "rounded-lg px-3 py-1 text-sm",
             filter === currentFilter
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
+              ? "bg-primary text-primary-foreground"
+              : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          )}
           key={filter}
           to={`/?filter=${filter}`}
         >

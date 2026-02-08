@@ -172,3 +172,14 @@ FacadeConstraints {
   - Prefer explicit Prisma includes/selects; avoid `include: { *: true }`.
   - Function bodies must use the `prisma.<entity>.<operation>` pattern directly.
 }
+
+## shadcn / Base UI Components
+
+- Config: `components.json` (style `base-vega`, icon library `@tabler/icons-react`)
+- Components live in `app/components/ui/`, copied from shadcn (not installed via CLI package)
+- Use `cn()` from `~/lib/utils` for conditional class merging
+- Use semantic color tokens (`text-foreground`, `text-muted-foreground`, `bg-primary`, `border-border`, etc.) instead of hardcoded Tailwind colors (`text-gray-900`, `bg-blue-600`, etc.)
+- Use `Button`, `Input`, `Textarea`, `FieldError` instead of raw HTML `<button>`, `<input>`, `<textarea>`, `<p role="alert">`
+- Hidden form inputs (`type="hidden"`) stay as plain `<input>` elements
+- Use Tabler icons (`@tabler/icons-react`) instead of inline SVGs
+- Dark mode via `className="system"` on `<html>` + `@custom-variant dark` in CSS (OS `prefers-color-scheme`)

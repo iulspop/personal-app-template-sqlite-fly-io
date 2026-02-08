@@ -2,6 +2,9 @@ import { useTranslation } from "react-i18next";
 import { Form } from "react-router";
 
 import { VERIFY_CODE_INTENT } from "../domain/auth-constants";
+import { Button } from "~/components/ui/button";
+import { FieldError } from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 
 type VerifyPageActionData =
   | { error: string; success: false }
@@ -22,10 +25,8 @@ export function VerifyPageComponent({
 
   return (
     <main className="mx-auto max-w-md px-4 py-16">
-      <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
-        {t("title")}
-      </h1>
-      <p className="mb-8 text-gray-600 dark:text-gray-400">
+      <h1 className="mb-2 text-3xl font-bold text-foreground">{t("title")}</h1>
+      <p className="mb-8 text-muted-foreground">
         {t("description", { email: target })}
       </p>
 
@@ -33,27 +34,27 @@ export function VerifyPageComponent({
         <input name="type" type="hidden" value={type} />
         <input name="target" type="hidden" value={target} />
         <div>
-          <input
+          <Input
             autoComplete="one-time-code"
-            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-center text-2xl tracking-widest text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            className="text-center text-2xl tracking-widest"
             maxLength={6}
             name="code"
             placeholder="XXXXXX"
             type="text"
           />
         </div>
-        <button
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+        <Button
+          className="w-full"
           name="intent"
           type="submit"
           value={VERIFY_CODE_INTENT}
         >
           {t("submit")}
-        </button>
+        </Button>
         {actionData?.success === false && (
-          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+          <FieldError>
             {tValidation(`validation.${actionData.error}` as never)}
-          </p>
+          </FieldError>
         )}
       </Form>
     </main>

@@ -23,19 +23,6 @@ import {
 import { useNonce } from "./utils/nonce-provider";
 import { securityMiddleware } from "./utils/security-middleware.server";
 
-export const links: Route.LinksFunction = () => [
-  { href: "https://fonts.googleapis.com", rel: "preconnect" },
-  {
-    crossOrigin: "anonymous",
-    href: "https://fonts.gstatic.com",
-    rel: "preconnect",
-  },
-  {
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-    rel: "stylesheet",
-  },
-];
-
 export const middleware = [
   securityMiddleware,
   i18nextMiddleware,
@@ -60,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const nonce = useNonce();
 
   return (
-    <html dir={i18n.dir()} lang={rootData?.locale ?? "en"}>
+    <html className="system" dir={i18n.dir()} lang={rootData?.locale ?? "en"}>
       <head>
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />

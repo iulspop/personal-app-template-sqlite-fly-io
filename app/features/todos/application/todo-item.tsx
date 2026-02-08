@@ -1,3 +1,4 @@
+import { IconCheck, IconPencil, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Form, useFetcher } from "react-router";
 
@@ -7,6 +8,8 @@ import {
   TOGGLE_TODO_INTENT,
 } from "../domain/todos-constants";
 import { TodoItemEditComponent } from "./todo-item-edit";
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 
 export function TodoItemDisplayComponent({
   onEdit,
@@ -16,102 +19,61 @@ export function TodoItemDisplayComponent({
   todo: Todo;
 }) {
   return (
-    <li className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+    <li className="flex items-center gap-3 rounded-lg border border-border p-4">
       <Form method="post">
         <input name="id" type="hidden" value={todo.id} />
-        <button
+        <Button
           aria-label={`Toggle ${todo.title}`}
-          className={`size-5 rounded border ${
-            todo.completed
-              ? "border-blue-600 bg-blue-600 text-white"
-              : "border-gray-400 dark:border-gray-500"
-          } flex items-center justify-center`}
+          className={cn(
+            "size-5",
+            todo.completed &&
+              "border-primary bg-primary text-primary-foreground",
+          )}
           name="intent"
+          size="icon-xs"
           type="submit"
           value={TOGGLE_TODO_INTENT}
+          variant="outline"
         >
-          {todo.completed && (
-            <svg
-              aria-hidden="true"
-              className="size-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M5 13l4 4L19 7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={3}
-              />
-            </svg>
-          )}
-        </button>
+          {todo.completed && <IconCheck className="size-3" />}
+        </Button>
       </Form>
 
       <div className="flex-1">
         <span
-          className={
-            todo.completed
-              ? "text-gray-500 line-through dark:text-gray-400"
-              : ""
-          }
+          className={todo.completed ? "text-muted-foreground line-through" : ""}
         >
           {todo.title}
         </span>
         {todo.description && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             {todo.description}
           </p>
         )}
       </div>
 
-      <button
+      <Button
         aria-label={`Edit ${todo.title}`}
-        className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
         onClick={onEdit}
+        size="icon-xs"
         type="button"
+        variant="ghost"
       >
-        <svg
-          aria-hidden="true"
-          className="size-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-          />
-        </svg>
-      </button>
+        <IconPencil className="size-4" />
+      </Button>
 
       <Form method="post">
         <input name="id" type="hidden" value={todo.id} />
-        <button
+        <Button
           aria-label={`Delete ${todo.title}`}
-          className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
           name="intent"
+          size="icon-xs"
           type="submit"
           value={DELETE_TODO_INTENT}
+          variant="ghost"
         >
-          <svg
-            aria-hidden="true"
-            className="size-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M6 18L18 6M6 6l12 12"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-          </svg>
-        </button>
+          <IconX className="size-4" />
+        </Button>
       </Form>
     </li>
   );

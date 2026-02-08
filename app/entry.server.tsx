@@ -79,7 +79,7 @@ export default function handleRequest(
                     MODE === "development" ? "ws:" : undefined,
                     "'self'",
                   ],
-                  "font-src": ["'self'", "https://fonts.gstatic.com"],
+                  "font-src": ["'self'"],
                   "frame-src": ["'self'"],
                   "img-src": ["'self'", "data:"],
                   "script-src": [
@@ -88,7 +88,7 @@ export default function handleRequest(
                     `'nonce-${nonce}'`,
                   ],
                   "script-src-attr": [`'nonce-${nonce}'`],
-                  "style-src": ["'self'", "https://fonts.googleapis.com"],
+                  "style-src": ["'self'"],
                 },
               },
               reportOnly: MODE !== "production",
