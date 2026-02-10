@@ -16,6 +16,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 
+import { ProgressBarComponent } from "./components/progress-bar";
 import { authMiddleware } from "./features/auth/application/auth-middleware.server";
 import {
   getLocale,
@@ -73,6 +74,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <ProgressBarComponent />
         <OpenImgContextProvider
           getSrc={getImgSrc}
           optimizerEndpoint="/api/images"
