@@ -30,4 +30,4 @@ Request: $ARGUMENTS
 - Each task MUST have code changes LESS than 50 lines.
 - Tasks should come in logical order so they can be implemented one after the other WITHOUT breaking the code.
 
-Write the plan into ai/plans/ with filename format: yyyy-mm-dd-title.md
+Write the plan into $TMPDIR/plans/ with filename format: yyyy-mm-dd-title.md
