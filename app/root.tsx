@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react-router";
+import { OpenImgContextProvider } from "openimg/react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,6 +22,7 @@ import {
   i18nextMiddleware,
   localeCookie,
 } from "./features/localization/i18next-middleware.server";
+import { getImgSrc } from "./utils/get-img-src";
 import { useNonce } from "./utils/nonce-provider";
 import { securityMiddleware } from "./utils/security-middleware.server";
 
@@ -63,7 +65,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <OpenImgContextProvider
+          getSrc={getImgSrc}
+          optimizerEndpoint="/api/images"
+        >
+          {children}
+        </OpenImgContextProvider>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Standard pattern for exposing ENV to client in React Router
           dangerouslySetInnerHTML={{

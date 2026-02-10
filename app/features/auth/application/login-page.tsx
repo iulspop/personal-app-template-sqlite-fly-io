@@ -1,3 +1,4 @@
+import { Img } from "openimg/react";
 import { useTranslation } from "react-i18next";
 import { Form } from "react-router";
 
@@ -26,6 +27,13 @@ export function LoginPageComponent({
 
   return (
     <main className="mx-auto max-w-md px-4 py-16">
+      <Img
+        alt=""
+        className="mb-8 size-12 rounded-lg"
+        height={48}
+        src="/images/logo.png"
+        width={48}
+      />
       <h1 className="mb-2 text-3xl font-bold text-foreground">{t("title")}</h1>
       <p className="mb-8 text-muted-foreground">{t("description")}</p>
 
