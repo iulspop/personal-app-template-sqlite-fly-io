@@ -35,6 +35,7 @@ Each test must answer these 5 questions:
 - Handle auth setup in helper functions, not inline in every test.
 - Clean up test data in teardown — don't leave state for the next test.
 - Each test should be independent and not depend on other tests' state.
+- Use `test.step("description", async () => { ... })` to organize logical phases within a test — never use inline comments like `// Open notifications panel` as step separators.
 - Block images in performance-sensitive tests via `page.route`.
 - Use `test.describe` blocks to group related scenarios.
 - Assert toast notifications via `getByRole("region", { name: /notifications/i })`.
