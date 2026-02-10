@@ -25,6 +25,9 @@ Each test must answer these 5 questions:
 - Test files use the `.e2e.ts` extension.
 - Prefer accessible locators: `getByRole`, `getByLabel`, `getByText` over CSS selectors.
 - Use `getByRole` with name option as the primary locator strategy.
+- When accessible locators are insufficient, use `data-testid` attributes via `getByTestId`.
+- Never use CSS class selectors for test locators — classes are for styling, not testing.
+- Define `data-testid` values as named exports in a shared constants file (e.g. `app/test/test-ids.ts`) and import them in both the component and the test.
 - Use regex with case-insensitive flag for text matching: `{ name: /submit/i }`.
 - Await all Playwright actions and assertions.
 - Use `toBeVisible()` and `toBeHidden()` for element presence checks.
