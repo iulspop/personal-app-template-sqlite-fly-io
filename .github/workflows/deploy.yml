@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: ["Pull Request"]
+    workflows: ["CI"]
     types:
       - completed
     branches:
