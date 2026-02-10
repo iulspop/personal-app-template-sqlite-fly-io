@@ -33,6 +33,12 @@ Each test must answer these 5 questions:
 - NO empty line between `actual` and `expected` assignments.
 - Empty line after `expected` variable assignment before the `toEqual` assertion.
 - Tests must be readable, isolated, thorough, and explicit.
-- For integration tests, test integration with the real system.
 - Test expected edge cases.
 - Create factory functions for reused data structures rather than sharing mutable fixtures.
+
+## When NOT to use this skill
+
+- For React component render tests (`.test.tsx`), use `/happy-dom-tests` instead.
+- For database or server action tests (`.spec.ts`), use `/integration-tests` instead.
+- For browser-level user flow tests (`.e2e.ts`), use `/e2e-tests` instead.
+- This skill is for pure function unit tests (`.test.ts`) only.

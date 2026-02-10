@@ -40,3 +40,10 @@ Each test must answer these 5 questions:
 - Group tests by intent when an action handles multiple form intents via `test.describe`.
 - Catch thrown `Response` objects for redirect assertions in middleware tests.
 - Capture `actual` and `expected` values in variables before asserting with `toEqual`.
+
+## When NOT to use this skill
+
+- For pure function tests (`.test.ts`), use `/unit-tests` instead.
+- For React component render tests (`.test.tsx`), use `/happy-dom-tests` instead.
+- For browser-level user flow tests (`.e2e.ts`), use `/e2e-tests` instead.
+- This skill is for server action, database, and API route tests (`.spec.ts`) only.

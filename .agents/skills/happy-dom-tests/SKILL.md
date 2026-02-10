@@ -40,3 +40,10 @@ Each test must answer these 5 questions:
 - Assert element state: `toBeDisabled()`, `toBeEnabled()`, `toHaveFocus()`.
 - Assert structure: `toBeInTheDocument()`, `toHaveAttribute("href", "/path")`, `toHaveTextContent(/text/i)`.
 - Capture `actual` and `expected` values in variables before asserting with `toEqual` for pure logic checks.
+
+## When NOT to use this skill
+
+- For pure function tests without React (`.test.ts`), use `/unit-tests` instead.
+- For database or server action tests (`.spec.ts`), use `/integration-tests` instead.
+- For browser-level user flow tests (`.e2e.ts`), use `/e2e-tests` instead.
+- This skill is for React component and hook render tests (`.test.tsx`) only.

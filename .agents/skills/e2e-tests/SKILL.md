@@ -45,3 +45,10 @@ Each test must answer these 5 questions:
 - Create reusable setup/teardown helpers for common flows (login, org creation, etc.).
 - Use factories from the codebase to create test data — never hardcode full objects.
 - Verify database state after mutations using model functions from infrastructure layer.
+
+## When NOT to use this skill
+
+- For pure function tests (`.test.ts`), use `/unit-tests` instead.
+- For React component render tests (`.test.tsx`), use `/happy-dom-tests` instead.
+- For server action or database tests (`.spec.ts`), use `/integration-tests` instead.
+- This skill is for Playwright browser tests (`.e2e.ts`) only.
