@@ -1,13 +1,23 @@
 import { reactRouter } from "@react-router/dev/vite";
+import { sentryReactRouter } from "@sentry/react-router";
 import tailwindcss from "@tailwindcss/vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
-export default defineConfig({
+export default defineConfig((config) => ({
   plugins: [
     tailwindcss(),
     !process.env.VITEST && reactRouter(),
+    !process.env.VITEST &&
+      sentryReactRouter(
+        {
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          org: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+        },
+        config,
+      ),
     tsconfigPaths(),
     devtoolsJson(),
   ],
@@ -40,4 +50,4 @@ export default defineConfig({
       },
     ],
   },
-});
+}));

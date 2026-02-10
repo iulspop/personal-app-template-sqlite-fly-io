@@ -27,6 +27,7 @@ WORKDIR /app
 COPY package.json ./
 COPY --from=production-dependencies-env /app/node_modules ./node_modules
 COPY --from=build-env /app/build ./build
+COPY --from=build-env /app/instrument.server.mjs ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 RUN pnpm prisma generate

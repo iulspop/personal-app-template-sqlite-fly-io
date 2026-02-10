@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -32,7 +33,11 @@ export const middleware = [
 export async function loader({ context }: Route.LoaderArgs) {
   const locale = getLocale(context);
   return data(
-    { allowIndexing: process.env.ALLOW_INDEXING !== "false", locale },
+    {
+      allowIndexing: process.env.ALLOW_INDEXING !== "false",
+      ENV: { MODE: process.env.NODE_ENV, SENTRY_DSN: process.env.SENTRY_DSN },
+      locale,
+    },
     {
       headers: {
         "Set-Cookie": await localeCookie.serialize(locale),
@@ -59,6 +64,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Standard pattern for exposing ENV to client in React Router
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(rootData?.ENV ?? {})}`,
+          }}
+          nonce={nonce}
+        />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>
@@ -79,6 +91,10 @@ export default function App({ loaderData: { locale } }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  if (error instanceof Error) {
+    Sentry.captureException(error);
+  }
+
   const { t } = useTranslation();
 
   let message = t("errorBoundary.oops");

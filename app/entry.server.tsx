@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { PassThrough } from "node:stream";
 import { contentSecurity } from "@nichtsam/helmet/content";
 import { createReadableStreamFromReadable } from "@react-router/node";
+import * as Sentry from "@sentry/react-router";
 import { isbot } from "isbot";
 import type { RenderToPipeableStreamOptions } from "react-dom/server";
 import { renderToPipeableStream } from "react-dom/server";
@@ -17,7 +18,7 @@ export const streamTimeout = 5000;
 const nonceLength = 16;
 const MODE = process.env.NODE_ENV ?? "development";
 
-export default function handleRequest(
+function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
@@ -25,10 +26,12 @@ export default function handleRequest(
   routerContextProvider: RouterContextProvider,
 ) {
   if (request.method.toUpperCase() === "HEAD") {
-    return new Response(null, {
-      headers: responseHeaders,
-      status: responseStatusCode,
-    });
+    return Promise.resolve(
+      new Response(null, {
+        headers: responseHeaders,
+        status: responseStatusCode,
+      }),
+    );
   }
 
   const nonce = crypto.randomBytes(nonceLength).toString("hex");
@@ -78,6 +81,7 @@ export default function handleRequest(
                   "connect-src": [
                     MODE === "development" ? "ws:" : undefined,
                     "'self'",
+                    "*.ingest.sentry.io",
                   ],
                   "font-src": ["'self'"],
                   "frame-src": ["'self'"],
@@ -96,7 +100,7 @@ export default function handleRequest(
             crossOriginEmbedderPolicy: false,
           });
 
-          pipe(body);
+          pipe(Sentry.getMetaTagTransformer(body));
 
           resolve(
             new Response(stream, {
@@ -118,3 +122,7 @@ export default function handleRequest(
     );
   });
 }
+
+export default Sentry.wrapSentryHandleRequest(handleRequest);
+
+export const handleError = Sentry.createSentryHandleError({ logErrors: true });
