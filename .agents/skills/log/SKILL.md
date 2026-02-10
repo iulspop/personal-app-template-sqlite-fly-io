@@ -1,5 +1,5 @@
 ---
-name: changelog-logger
+name: log
 description: Logs completed epics and significant accomplishments in reverse chronological order. Use after completing major features, releases, or architecture changes to maintain a project changelog.
 ---
 

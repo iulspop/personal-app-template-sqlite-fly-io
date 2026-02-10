@@ -1,5 +1,5 @@
 ---
-name: naming-conventions
+name: name
 description: Suggests clear, descriptive names for functions and variables following consistent naming conventions. Use when naming new code constructs, renaming for clarity, or reviewing naming in code reviews.
 ---
 

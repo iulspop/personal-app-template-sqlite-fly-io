@@ -1,5 +1,5 @@
 ---
-name: business-writer
+name: write
 description: Improves text for clarity, directness, and engagement following professional writing best practices. Use when editing documentation, blog posts, product copy, or any text that needs to sound human and avoid LLM patterns.
 ---
 
