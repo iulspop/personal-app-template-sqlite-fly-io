@@ -8,8 +8,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig((config) => ({
   plugins: [
     tailwindcss(),
-    !process.env.VITEST && reactRouter(),
+    !process.env.VITEST && !process.env.STORYBOOK && reactRouter(),
     !process.env.VITEST &&
+      !process.env.STORYBOOK &&
       sentryReactRouter(
         {
           authToken: process.env.SENTRY_AUTH_TOKEN,

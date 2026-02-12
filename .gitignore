@@ -19,5 +19,8 @@ prisma/*.db-journal
 app/test/mocks/fixtures/
 tests/fixtures/openimg/
 
+# Storybook
+/storybook-static/
+
 # Image optimization cache
 /data/images/
