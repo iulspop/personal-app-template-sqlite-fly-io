@@ -30,7 +30,9 @@ export default defineConfig({
   testMatch: "*.e2e.ts",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    baseURL: process.env.APP_URL ?? "http://localhost:5173",
+    baseURL:
+      process.env.APP_URL ??
+      (process.env.CI ? "http://localhost:3000" : "http://localhost:5173"),
     trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
   },
 
