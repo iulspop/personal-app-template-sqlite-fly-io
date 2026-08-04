@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react-router"
 import { OpenImgContextProvider } from "openimg/react"
 import {
   data,
@@ -34,6 +35,11 @@ export async function loader({ request }: Route.LoaderArgs) {
       MODE: process.env.NODE_ENV,
       POSTHOG_API_HOST: process.env.POSTHOG_API_HOST,
       POSTHOG_API_KEY: process.env.POSTHOG_API_KEY,
+      SENTRY_DSN: process.env.SENTRY_DSN,
+      SENTRY_ENVIRONMENT:
+        process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
+      SENTRY_RELEASE: process.env.SENTRY_RELEASE,
+      SENTRY_TRACES_SAMPLE_RATE: process.env.SENTRY_TRACES_SAMPLE_RATE,
     },
     isAuthenticated: Boolean(await getUserId(request)),
     requestInfo: {
@@ -113,9 +119,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       error.status === 404
         ? "The requested page could not be found."
         : error.statusText || details
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message
-    stack = error.stack
+  } else if (error && error instanceof Error) {
+    Sentry.captureException(error)
+
+    if (import.meta.env.DEV) {
+      details = error.message
+      stack = error.stack
+    }
   }
 
   return (

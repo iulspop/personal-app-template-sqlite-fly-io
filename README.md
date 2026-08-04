@@ -59,8 +59,15 @@ Create these secrets/config values in Infisical:
 | `EMAIL_FROM` | Sender address for emails | `noreply@example.com` |
 | `APP_URL` | Public application URL for magic links | `http://localhost:5250` or Fly URL |
 | `ALLOW_INDEXING` | Allow search engine indexing (`true`/`false`) | `false` for staging |
-| `POSTHOG_API_KEY` | Optional PostHog project key | `phc_...` |
+| `POSTHOG_API_KEY` | Optional PostHog project key; enables analytics and production session replay | `phc_...` |
 | `POSTHOG_API_HOST` | Optional PostHog API host | `https://us.i.posthog.com` |
+| `SENTRY_DSN` | Optional public Sentry DSN; enables client/server errors and tracing | `https://...@...ingest.sentry.io/...` |
+| `SENTRY_ENVIRONMENT` | Optional Sentry environment name | `development`, `staging`, or `production` |
+| `SENTRY_TRACES_SAMPLE_RATE` | Optional trace sample rate from `0` to `1` | `0.1` |
+| `SENTRY_RELEASE` | Optional release identifier shared by runtime events and source maps | Git commit SHA or app version |
+| `SENTRY_AUTH_TOKEN` | Optional build-only token for source map uploads | Stored in Infisical |
+| `SENTRY_ORG` | Sentry organization slug required for source map uploads | `your-org` |
+| `SENTRY_PROJECT` | Sentry project slug required for source map uploads | `your-project` |
 | `FLY_API_TOKEN` | Fly deploy token for CI deploys | Stored in Infisical `prod` `/web` |
 | `OWNER_EMAIL_ALLOWLIST` | Comma-separated verified emails allowed to claim the sole owner seat | `owner@example.com` |
 | `OWNER_PHONE_NUMBER` | Optional owner SMS notification destination | E.164 number such as `+15551234567` |
@@ -69,6 +76,15 @@ Create these secrets/config values in Infisical:
 | `TWILIO_FROM_NUMBER` | Optional Twilio sender number | E.164 number |
 
 Twilio is optional. If any SMS value is missing, chat and email notifications continue normally and no SMS delivery is attempted.
+
+### Observability
+
+PostHog and Sentry are integrated but remain disabled when their project configuration is absent:
+
+- PostHog captures page views whenever `POSTHOG_API_KEY` is configured and enables session replay only in production.
+- Sentry captures browser and server errors plus React Router page-load, navigation, loader, action, and middleware traces whenever `SENTRY_DSN` is configured.
+- Production source maps upload only when `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` are all configured. The uploaded maps are removed from the build output afterward.
+- `SENTRY_DSN` is intentionally exposed to the browser; keep `SENTRY_AUTH_TOKEN` server/build-only.
 
 The repo still defensively ignores `.env*` files so secrets are not accidentally committed.
 

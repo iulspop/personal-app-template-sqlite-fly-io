@@ -1,7 +1,10 @@
+import "../instrument.server.mjs"
+
 import crypto from "node:crypto"
 import { PassThrough } from "node:stream"
 import { contentSecurity } from "@nichtsam/helmet/content"
 import { createReadableStreamFromReadable } from "@react-router/node"
+import * as Sentry from "@sentry/react-router"
 import { isbot } from "isbot"
 import type { RenderToPipeableStreamOptions } from "react-dom/server"
 import { renderToPipeableStream } from "react-dom/server"
@@ -10,6 +13,7 @@ import { ServerRouter } from "react-router"
 
 import { NonceProvider } from "./utils/nonce-provider"
 
+export const instrumentations = [Sentry.createSentryServerInstrumentation()]
 export const streamTimeout = 5000
 
 const nonceLength = 16
@@ -71,6 +75,8 @@ function handleRequest(
                     "'self'",
                     "https://*.posthog.com",
                     "https://*.i.posthog.com",
+                    "https://*.ingest.sentry.io",
+                    "https://*.ingest.us.sentry.io",
                   ],
                   "font-src": ["'self'"],
                   "frame-src": ["'self'"],
@@ -116,6 +122,4 @@ function handleRequest(
 
 export default handleRequest
 
-export function handleError(error: unknown) {
-  console.error(error)
-}
+export const handleError = Sentry.createSentryHandleError({ logErrors: true })
