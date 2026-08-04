@@ -22,7 +22,10 @@ import {
   retrieveVerificationFromDatabaseByTypeAndTarget,
   saveVerificationToDatabase,
 } from "~/features/auth/infrastructure/verifications-model.server"
-import { isOwnerEmailAllowed } from "~/features/chat/domain/chat-domain"
+import {
+  isOwnerEmailAllowed,
+  parseOwnerEmailAllowlist,
+} from "~/features/chat/domain/chat-domain"
 import {
   countUnreadMessages,
   retrieveOrCreateConversation,
@@ -107,7 +110,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     canClaimOwner:
       !ownerClaim &&
       Boolean(user?.emailVerifiedAt) &&
-      Boolean(user && isOwnerEmailAllowed(user.email)),
+      Boolean(
+        user &&
+          isOwnerEmailAllowed(
+            user.email,
+            parseOwnerEmailAllowlist(process.env.OWNER_EMAIL_ALLOWLIST),
+          ),
+      ),
     chatUnreadCount,
     counts: countByStatus(allTodos),
     filter,

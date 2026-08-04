@@ -107,7 +107,8 @@ describe("owner email allowlist", () => {
   })
 
   test("given: an allowed email with different casing, should: allow owner claim", () => {
-    const actual = isOwnerEmailAllowed("OWNER@example.com", "owner@example.com")
+    const allowedEmails = parseOwnerEmailAllowlist("owner@example.com")
+    const actual = isOwnerEmailAllowed("OWNER@example.com", allowedEmails)
     const expected = true
 
     expect(actual).toEqual(expected)

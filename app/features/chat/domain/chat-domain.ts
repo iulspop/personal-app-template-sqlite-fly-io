@@ -80,9 +80,7 @@ export function parseOwnerEmailAllowlist(value: string | undefined) {
 
 export function isOwnerEmailAllowed(
   email: string,
-  allowlistValue = process.env.OWNER_EMAIL_ALLOWLIST,
+  allowedEmails: ReadonlySet<string>,
 ) {
-  return parseOwnerEmailAllowlist(allowlistValue).has(
-    email.trim().toLowerCase(),
-  )
+  return allowedEmails.has(email.trim().toLowerCase())
 }

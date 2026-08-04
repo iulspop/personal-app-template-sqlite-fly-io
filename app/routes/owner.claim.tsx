@@ -4,7 +4,10 @@ import type { Route } from "./+types/owner.claim"
 import { requireUserId } from "~/features/auth/application/auth-session.server"
 import { OwnerOnboardingPage } from "~/features/chat/application/owner-onboarding-page"
 import { CHAT_CLAIM_OWNER_INTENT } from "~/features/chat/domain/chat-constants"
-import { isOwnerEmailAllowed } from "~/features/chat/domain/chat-domain"
+import {
+  isOwnerEmailAllowed,
+  parseOwnerEmailAllowlist,
+} from "~/features/chat/domain/chat-domain"
 import {
   claimOwnerSeat,
   retrieveOwnerClaim,
@@ -25,7 +28,10 @@ async function getClaimContext(request: Request) {
     eligible:
       claim === null &&
       user.emailVerifiedAt !== null &&
-      isOwnerEmailAllowed(user.email),
+      isOwnerEmailAllowed(
+        user.email,
+        parseOwnerEmailAllowlist(process.env.OWNER_EMAIL_ALLOWLIST),
+      ),
     userId,
   }
 }
