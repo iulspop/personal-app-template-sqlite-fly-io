@@ -1,0 +1,6 @@
+<svg aria-labelledby="title" role="img" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" >
+  <title id="title">Personal App icon</title>
+  <rect fill="#11100f" height="512" rx="112" width="512" />
+  <path d="M146 132h118c72 0 118 42 118 108 0 67-46 110-118 110h-54v54h-64V132Zm64 58v102h50c36 0 57-18 57-52 0-33-21-50-57-50h-50Z" fill="#fdfcfb"/>
+  <circle cx="360" cy="376" fill="#2563eb" r="36" />
+</svg>

@@ -28,8 +28,25 @@ npx create-react-router@latest --template iulspop/personal-app-template-with-dem
 - Optional product analytics and session replay with [PostHog](https://posthog.com/)
 - Healthcheck endpoint (`/healthcheck`)
 - Dark mode (OS `prefers-color-scheme`)
+- Minimum installable PWA shell for iOS, Android, and supported desktop browsers
 - Accessibility testing with [Axe](https://www.npmjs.com/package/@axe-core/playwright)
 - CI/CD with GitHub Actions + auto-deploy to [Fly.io](https://fly.io/)
+
+### Installable PWA shell
+
+The template includes a web app manifest, standard and maskable icons, an Apple touch icon, and mobile install metadata. Configure the installed app identity in `app/config/app-config.ts`. After changing `public/icons/app-icon-source.svg`, regenerate the checked-in PNG assets with:
+
+```bash
+pnpm pwa:assets
+```
+
+Installation depends on the browser and requires HTTPS in production (`localhost` is accepted for local testing):
+
+- **iOS/iPadOS Safari:** Share menu → **Add to Home Screen**.
+- **Android Chromium browsers:** browser menu or native install prompt → **Install app** / **Add to Home screen**.
+- **Desktop Chromium browsers:** use the install action in the address bar or browser menu when offered.
+
+Browser wording and install UI vary by platform and version. This template intentionally has **no service worker, offline mode, Cache Storage strategy, update lifecycle, push notifications, background sync, offline mutation queue, or app-store packaging**. Installed launches use normal network behavior, just like the website.
 
 ## Getting Started
 
@@ -155,11 +172,13 @@ The interface uses a light-first, density-conscious product system built with Va
 | `pnpm start` | Start production server |
 | `pnpm check` | Auto-fix lint/format issues (Biome) |
 | `pnpm lint` | Check for lint/format errors without fixing (CI) |
+| `pnpm pwa:assets` | Regenerate checked-in PWA install icons from the source SVG |
 | `pnpm typecheck:secrets` | Generate route types + TypeScript type check with Infisical config |
 | `pnpm test:secrets` | Run Vitest tests once with Infisical config |
 | `pnpm test:watch` | Run Vitest in watch mode |
 | `pnpm test:e2e:secrets` | Run Playwright E2E tests with Infisical config |
 | `pnpm test:e2e:ui` | Run Playwright with interactive UI |
+| `pnpm test:pwa` | Build and verify the minimum install shell on an isolated production server |
 | `pnpm secrets:dev <command>` | Run any command with Infisical `dev` `/web` config |
 | `pnpm secrets:staging <command>` | Run any command with Infisical `staging` `/web` config |
 | `pnpm secrets:prod <command>` | Run any command with Infisical `prod` `/web` config |

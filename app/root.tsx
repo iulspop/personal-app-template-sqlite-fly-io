@@ -12,6 +12,7 @@ import {
 } from "react-router"
 
 import type { Route } from "./+types/root"
+import { appConfig } from "./config/app-config"
 import { darkThemeClass, lightThemeClass } from "./design-system/theme.css"
 import "./design-system/global.css"
 
@@ -59,7 +60,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html
       className={lightThemeClass}
       dir="ltr"
-      lang="en"
+      lang={appConfig.locale}
       suppressHydrationWarning
     >
       <head>
@@ -71,7 +72,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <ClientHintCheck nonce={nonce} />
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <title>Personal App</title>
+        <title>{appConfig.name}</title>
+        <meta content={appConfig.description} name="description" />
+        <meta content={appConfig.name} name="application-name" />
+        <meta content="yes" name="mobile-web-app-capable" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+        <meta content="default" name="apple-mobile-web-app-status-bar-style" />
+        <meta content={appConfig.shortName} name="apple-mobile-web-app-title" />
+        <meta content="telephone=no" name="format-detection" />
+        <meta
+          content={appConfig.themeColor.light}
+          media="(prefers-color-scheme: light)"
+          name="theme-color"
+        />
+        <meta
+          content={appConfig.themeColor.dark}
+          media="(prefers-color-scheme: dark)"
+          name="theme-color"
+        />
+        <link href="/manifest.webmanifest" rel="manifest" />
+        <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
         {!rootData?.allowIndexing && (
           <meta content="noindex, nofollow" name="robots" />
         )}
