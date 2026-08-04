@@ -2,6 +2,13 @@ name: Pull Request
 
 on:
   pull_request: {}
+  workflow_dispatch:
+    inputs:
+      run_checks:
+        description: Run all pull request checks
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +23,9 @@ jobs:
   commitlint:
     name: ⚙️ commitlint
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.actor != 'dependabot[bot]'
+    if: >
+      github.actor != 'dependabot[bot]' &&
+      (vars.RUN_CI == 'true' || inputs.run_checks == true)
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -29,6 +38,7 @@ jobs:
 
   lint:
     name: ⬣ Biome
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo
@@ -60,6 +70,7 @@ jobs:
 
   type-check:
     name: ʦ TypeScript
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo
@@ -91,6 +102,7 @@ jobs:
 
   vitest:
     name: ⚡ Vitest
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo
@@ -125,6 +137,7 @@ jobs:
 
   playwright-chrome:
     name: 🎭 Playwright Chrome
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo

@@ -5,6 +5,13 @@ on:
     branches:
       - main
       - dev
+  workflow_dispatch:
+    inputs:
+      run_checks:
+        description: Run all CI checks
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,6 +24,7 @@ permissions:
 jobs:
   lint:
     name: ⬣ Biome
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo
@@ -48,6 +56,7 @@ jobs:
 
   type-check:
     name: ʦ TypeScript
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo
@@ -79,6 +88,7 @@ jobs:
 
   vitest:
     name: ⚡ Vitest
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo
@@ -113,6 +123,7 @@ jobs:
 
   playwright-chrome:
     name: 🎭 Playwright Chrome
+    if: vars.RUN_CI == 'true' || inputs.run_checks == true
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: ⬇️ Checkout repo

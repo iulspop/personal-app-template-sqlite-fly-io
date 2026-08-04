@@ -148,7 +148,7 @@ The interface uses a light-first, density-conscious product system built with Va
 | `pnpm secrets:staging <command>` | Run any command with Infisical `staging` `/web` config |
 | `pnpm secrets:prod <command>` | Run any command with Infisical `prod` `/web` config |
 
-CI jobs load Infisical secrets through GitHub OIDC before running the standard `pnpm lint`, `pnpm typecheck`, `pnpm test`, and build commands.
+When enabled, CI jobs load Infisical secrets through GitHub OIDC before running the standard `pnpm lint`, `pnpm typecheck`, `pnpm test`, and build commands.
 
 ### Database Scripts
 
@@ -251,17 +251,11 @@ flyctl tokens create deploy --app personal-app-template-sqlite-fly-io
 
 ### CI/CD
 
-**Pull Request workflow** (`.github/workflows/pr.yml`) runs on all PRs:
+CI and pull-request checks are skipped by default. To enable all automatic checks, set the repository variable `RUN_CI` to `true`. You can also run either workflow manually with its `run_checks` input enabled.
 
-1. Commitlint
-2. Biome lint
-3. TypeScript type check
-4. Vitest (unit + integration + component with coverage)
-5. Playwright Chrome (E2E)
+When enabled, the pull-request workflow runs commitlint, Biome, TypeScript, Vitest with coverage, and Playwright Chrome. The CI workflow runs Biome, TypeScript, Vitest with coverage, and Playwright Chrome on pushes to `main` and `dev`.
 
-**CI workflow** (`.github/workflows/ci.yml`) runs on pushes to `main`/`dev`.
-
-**Deploy workflow** (`.github/workflows/deploy.yml`) auto-deploys to Fly.io when CI passes on `main`.
+The deploy workflow can always be run manually. Automatic deployment after a successful `main` CI run only occurs when `RUN_CI` is `true`.
 
 ### Docker
 
