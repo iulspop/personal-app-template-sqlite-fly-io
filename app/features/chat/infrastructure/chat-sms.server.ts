@@ -1,13 +1,15 @@
 import twilio from "twilio"
 
+import { getServerEnv } from "../../../config/server-env.server"
 import type { ChatDeliveryResult } from "./chat-email.server"
 
 export function isOwnerChatSmsConfigured(recipientPhone?: string) {
+  const env = getServerEnv()
   return Boolean(
     recipientPhone &&
-      process.env.TWILIO_ACCOUNT_SID &&
-      process.env.TWILIO_AUTH_TOKEN &&
-      process.env.TWILIO_FROM_NUMBER,
+      env.TWILIO_ACCOUNT_SID &&
+      env.TWILIO_AUTH_TOKEN &&
+      env.TWILIO_FROM_NUMBER,
   )
 }
 
@@ -18,9 +20,10 @@ export async function sendOwnerChatSms({
   dashboardUrl: string
   recipientPhone: string
 }): Promise<ChatDeliveryResult> {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID
-  const authToken = process.env.TWILIO_AUTH_TOKEN
-  const from = process.env.TWILIO_FROM_NUMBER
+  const env = getServerEnv()
+  const accountSid = env.TWILIO_ACCOUNT_SID
+  const authToken = env.TWILIO_AUTH_TOKEN
+  const from = env.TWILIO_FROM_NUMBER
   if (!isOwnerChatSmsConfigured(recipientPhone))
     return { delivered: false, errorCode: "SMS_NOT_CONFIGURED" }
 

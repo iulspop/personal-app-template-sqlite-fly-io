@@ -37,7 +37,7 @@ export default async function viteConfig(config: ConfigEnv) {
         {
           extends: true,
           test: {
-            include: ["app/**/*.test.ts"],
+            include: ["app/**/*.test.ts", "scripts/**/*.test.ts"],
             name: "unit-tests",
           },
         },

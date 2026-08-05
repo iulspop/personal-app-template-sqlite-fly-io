@@ -11,13 +11,14 @@ import { renderToPipeableStream } from "react-dom/server"
 import type { EntryContext, RouterContextProvider } from "react-router"
 import { ServerRouter } from "react-router"
 
+import { getServerEnv } from "./config/server-env.server"
 import { NonceProvider } from "./utils/nonce-provider"
 
 export const instrumentations = [Sentry.createSentryServerInstrumentation()]
 export const streamTimeout = 5000
 
 const nonceLength = 16
-const MODE = process.env.NODE_ENV ?? "development"
+const MODE = getServerEnv().NODE_ENV
 
 function handleRequest(
   request: Request,

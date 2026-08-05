@@ -13,6 +13,7 @@ import {
 
 import type { Route } from "./+types/root"
 import { appConfig } from "./config/app-config"
+import { getServerEnv } from "./config/server-env.server"
 import { darkThemeClass, lightThemeClass } from "./design-system/theme.css"
 import "./design-system/global.css"
 
@@ -30,17 +31,18 @@ import { securityMiddleware } from "./utils/security-middleware.server"
 export const middleware = [securityMiddleware, authMiddleware]
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const env = getServerEnv()
+
   return data({
-    allowIndexing: process.env.ALLOW_INDEXING !== "false",
+    allowIndexing: env.ALLOW_INDEXING,
     ENV: {
-      MODE: process.env.NODE_ENV,
-      POSTHOG_API_HOST: process.env.POSTHOG_API_HOST,
-      POSTHOG_API_KEY: process.env.POSTHOG_API_KEY,
-      SENTRY_DSN: process.env.SENTRY_DSN,
-      SENTRY_ENVIRONMENT:
-        process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
-      SENTRY_RELEASE: process.env.SENTRY_RELEASE,
-      SENTRY_TRACES_SAMPLE_RATE: process.env.SENTRY_TRACES_SAMPLE_RATE,
+      MODE: env.NODE_ENV,
+      POSTHOG_API_HOST: env.POSTHOG_API_HOST,
+      POSTHOG_API_KEY: env.POSTHOG_API_KEY,
+      SENTRY_DSN: env.SENTRY_DSN,
+      SENTRY_ENVIRONMENT: env.SENTRY_ENVIRONMENT ?? env.NODE_ENV,
+      SENTRY_RELEASE: env.SENTRY_RELEASE,
+      SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE?.toString(),
     },
     isAuthenticated: Boolean(await getUserId(request)),
     requestInfo: {

@@ -2,6 +2,7 @@ import { data, redirect } from "react-router"
 
 import type { Route } from "./+types/settings"
 import { AppShell } from "~/components/app-shell/app-shell"
+import { getServerEnv } from "~/config/server-env.server"
 import { requireUserId } from "~/features/auth/application/auth-session.server"
 import { SettingsPageComponent } from "~/features/auth/application/settings-page"
 import {
@@ -13,6 +14,7 @@ import { isOwnerChatSmsConfigured } from "~/features/chat/infrastructure/chat-sm
 import { retrieveUserFromDatabaseById } from "~/features/users/infrastructure/users-model.server"
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const env = getServerEnv()
   const userId = await requireUserId(request)
   const [ownerStatus, passkeys, user] = await Promise.all([
     retrieveOwnerStatusForUser(userId),
@@ -23,10 +25,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) throw redirect("/auth/signin")
 
   return {
-    chatEmailConfigured: Boolean(
-      process.env.RESEND_API_KEY && process.env.EMAIL_FROM,
-    ),
-    chatSmsConfigured: isOwnerChatSmsConfigured(process.env.OWNER_PHONE_NUMBER),
+    chatEmailConfigured: Boolean(env.RESEND_API_KEY && env.EMAIL_FROM),
+    chatSmsConfigured: isOwnerChatSmsConfigured(env.OWNER_PHONE_NUMBER),
     isOwner: Boolean(ownerStatus),
     pageTitle: "Settings",
     passkeys: passkeys.map((passkey) => ({

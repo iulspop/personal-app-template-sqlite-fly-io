@@ -3,6 +3,7 @@ import { invariantResponse } from "@epic-web/invariant"
 import { getImgResponse } from "openimg/node"
 
 import type { Route } from "./+types/api.images"
+import { getServerEnv } from "~/config/server-env.server"
 import { getDomainUrl } from "~/utils/get-domain-url.server"
 
 let cacheDir: string | null = null
@@ -10,7 +11,7 @@ let cacheDir: string | null = null
 async function getCacheDir() {
   if (cacheDir) return cacheDir
   let dir = "./tests/fixtures/openimg"
-  if (process.env.NODE_ENV === "production") {
+  if (getServerEnv().NODE_ENV === "production") {
     const isAccessible = await fs
       .access("/data", constants.W_OK)
       .then(() => true)

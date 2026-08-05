@@ -1,5 +1,7 @@
 import { Resend } from "resend"
 
+import { getServerEnv } from "../../../config/server-env.server"
+
 export type ChatDeliveryResult =
   | { delivered: true; providerId: string | null }
   | { delivered: false; errorCode: string }
@@ -13,12 +15,13 @@ export async function sendOwnerChatEmail({
   recipientEmail: string
   senderEmail: string
 }): Promise<ChatDeliveryResult> {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) return { delivered: false, errorCode: "EMAIL_NOT_CONFIGURED" }
+  const env = getServerEnv()
+  if (!env.RESEND_API_KEY)
+    return { delivered: false, errorCode: "EMAIL_NOT_CONFIGURED" }
 
   try {
-    const result = await new Resend(apiKey).emails.send({
-      from: process.env.EMAIL_FROM ?? "noreply@example.com",
+    const result = await new Resend(env.RESEND_API_KEY).emails.send({
+      from: env.EMAIL_FROM,
       html: `<p>You have a new private chat message from ${escapeHtml(senderEmail)}.</p><p><a href="${escapeHtml(dashboardUrl)}">Open the secure chat dashboard</a></p>`,
       subject: "New private chat message",
       text: `You have a new private chat message from ${senderEmail}. Open the secure dashboard: ${dashboardUrl}`,

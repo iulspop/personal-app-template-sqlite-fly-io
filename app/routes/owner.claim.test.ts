@@ -1,6 +1,7 @@
-import { describe, expect, test, vi } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
 import { action, loader } from "./owner.claim"
+import { resetServerEnvCacheForTests } from "~/config/server-env.server"
 import { requireUserId } from "~/features/auth/application/auth-session.server"
 import {
   claimOwnerSeat,
@@ -32,6 +33,10 @@ const args = (request: Request) => ({
 })
 
 describe("owner claim route", () => {
+  beforeEach(() => {
+    resetServerEnvCacheForTests()
+  })
+
   test("given: an allowlisted verified user, should: expose owner claim", async () => {
     process.env.OWNER_EMAIL_ALLOWLIST = "OWNER@example.com"
     const actual = await loader(

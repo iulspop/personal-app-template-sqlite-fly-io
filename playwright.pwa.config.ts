@@ -22,9 +22,11 @@ export default defineConfig({
   webServer: {
     command: "pnpm start",
     env: {
+      APP_URL: `http://localhost:${port}`,
       DATABASE_URL: databaseUrl,
       NODE_ENV: "production",
       PORT: String(port),
+      SESSION_SECRET: "pwa-install-test-session-secret",
       TZ: "UTC",
     },
     port,

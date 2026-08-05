@@ -48,6 +48,8 @@ Installation depends on the browser and requires HTTPS in production (`localhost
 
 Browser wording and install UI vary by platform and version. This template intentionally has **no service worker, offline mode, Cache Storage strategy, update lifecycle, push notifications, background sync, offline mutation queue, or app-store packaging**. Installed launches use normal network behavior, just like the website.
 
+Before a production launch, manually verify the native install UI in iOS/iPadOS Safari, Android Chrome, and desktop Chromium. Also smoke-test authentication, passkeys, Todos, founder chat/SSE/attachments, Settings, PostHog, and Sentry against the deployed HTTPS application. These platform and live-integration checks are intentionally not reported as automated doctor passes.
+
 ## Getting Started
 
 ### Prerequisites
@@ -111,6 +113,29 @@ The repo still defensively ignores `.env*` files so secrets are not accidentally
 pnpm install
 ```
 
+### Configure a new app
+
+Run the conservative initializer after cloning:
+
+```bash
+pnpm setup
+pnpm setup -- --dry-run
+pnpm setup -- --config setup.json --non-interactive
+```
+
+The JSON config uses `appName`, `shortName`, `description`, `locale`, `productionUrl`, and `iconSource`. Setup updates only `app/config/app-config.ts` and the canonical icon source/assets. It previews changes, requires confirmation for interactive writes, never writes secrets, never deploys, and never starts the development server. Configure the printed secret checklist in Infisical `/web` rather than creating `.env` files.
+
+Check repository readiness at any time:
+
+```bash
+pnpm app:doctor
+pnpm app:doctor -- --json
+pnpm app:doctor -- --strict --production
+pnpm check:architecture
+```
+
+Doctor is read-only and reports names and statuses without secret values. Exit code `0` means ready; exit code `1` means blocking failures. Warnings are non-blocking unless `--strict` is used. `--production` validates the production environment contract, including `APP_URL`, `DATABASE_URL`, and `SESSION_SECRET`.
+
 ### Quick Start
 
 Run secret-dependent commands through Infisical:
@@ -170,7 +195,10 @@ The interface uses a light-first, density-conscious product system built with Va
 | `pnpm dev:secrets` | Start dev server with Infisical `dev` `/web` config |
 | `pnpm build:secrets` | Production build with Infisical `dev` `/web` config |
 | `pnpm start` | Start production server |
+| `pnpm setup` | Preview and configure app identity and PWA assets |
+| `pnpm app:doctor` | Run read-only starter readiness checks |
 | `pnpm check` | Auto-fix lint/format issues (Biome) |
+| `pnpm check:architecture` | Enforce feature-layer import boundaries |
 | `pnpm lint` | Check for lint/format errors without fixing (CI) |
 | `pnpm pwa:assets` | Regenerate checked-in PWA install icons from the source SVG |
 | `pnpm typecheck:secrets` | Generate route types + TypeScript type check with Infisical config |

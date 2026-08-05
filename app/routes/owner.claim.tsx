@@ -1,6 +1,7 @@
 import { data, redirect } from "react-router"
 
 import type { Route } from "./+types/owner.claim"
+import { getServerEnv } from "~/config/server-env.server"
 import { requireUserId } from "~/features/auth/application/auth-session.server"
 import { OwnerOnboardingPage } from "~/features/chat/application/owner-onboarding-page"
 import { CHAT_CLAIM_OWNER_INTENT } from "~/features/chat/domain/chat-constants"
@@ -16,6 +17,7 @@ import { isOwnerChatSmsConfigured } from "~/features/chat/infrastructure/chat-sm
 import { retrieveUserFromDatabaseById } from "~/features/users/infrastructure/users-model.server"
 
 async function getClaimContext(request: Request) {
+  const env = getServerEnv()
   const userId = await requireUserId(request)
   const [claim, user] = await Promise.all([
     retrieveOwnerClaim(),
@@ -30,7 +32,7 @@ async function getClaimContext(request: Request) {
       user.emailVerifiedAt !== null &&
       isOwnerEmailAllowed(
         user.email,
-        parseOwnerEmailAllowlist(process.env.OWNER_EMAIL_ALLOWLIST),
+        parseOwnerEmailAllowlist(env.OWNER_EMAIL_ALLOWLIST),
       ),
     userId,
   }
@@ -41,7 +43,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   return {
     eligible,
     pageTitle: "Owner chat setup",
-    phoneConfigured: isOwnerChatSmsConfigured(process.env.OWNER_PHONE_NUMBER),
+    phoneConfigured: isOwnerChatSmsConfigured(
+      getServerEnv().OWNER_PHONE_NUMBER,
+    ),
   }
 }
 

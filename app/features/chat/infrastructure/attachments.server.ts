@@ -5,6 +5,7 @@ import { Readable, Transform } from "node:stream"
 import { pipeline } from "node:stream/promises"
 import { createId } from "@paralleldrive/cuid2"
 
+import { getServerEnv } from "../../../config/server-env.server"
 import {
   CHAT_ATTACHMENT_MAX_BYTES,
   CHAT_ATTACHMENT_MIME_TYPES,
@@ -17,11 +18,7 @@ const extensionByMimeType = {
   "image/webp": ".webp",
 } as const
 
-export const chatAttachmentDirectory =
-  process.env.CHAT_ATTACHMENT_DIRECTORY ??
-  (process.env.NODE_ENV === "production"
-    ? "/data/chat-attachments"
-    : join(process.cwd(), ".data/chat-attachments"))
+export const chatAttachmentDirectory = getServerEnv().CHAT_ATTACHMENT_DIRECTORY
 
 function detectMimeType(bytes: Buffer) {
   if (bytes.subarray(0, 4).equals(Buffer.from("%PDF"))) return "application/pdf"

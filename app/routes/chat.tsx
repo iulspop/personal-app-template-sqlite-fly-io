@@ -2,6 +2,7 @@ import { redirect } from "react-router"
 
 import type { Route } from "./+types/chat"
 import { AppShell } from "~/components/app-shell/app-shell"
+import { getServerEnv } from "~/config/server-env.server"
 import { requireUserId } from "~/features/auth/application/auth-session.server"
 import {
   formatPresence,
@@ -75,7 +76,7 @@ export async function action({ request }: Route.ActionArgs) {
     const sender = await retrieveUserFromDatabaseById(userId)
     if (sender)
       void notifyOwnerOfChatMessage({
-        dashboardUrl: `${process.env.APP_URL ?? new URL(request.url).origin}/owner/chats/${conversation.id}`,
+        dashboardUrl: `${getServerEnv().APP_URL || new URL(request.url).origin}/owner/chats/${conversation.id}`,
         messageId: result.data.messageId,
         ownerEmail: ownerClaim.user.email,
         ownerId: ownerClaim.userId,

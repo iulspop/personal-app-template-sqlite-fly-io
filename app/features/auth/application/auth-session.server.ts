@@ -1,5 +1,6 @@
 import { createCookieSessionStorage, redirect } from "react-router"
 
+import { getServerEnv } from "../../../config/server-env.server"
 import { SESSION_EXPIRY_DAYS } from "../domain/auth-constants"
 import { computeSessionExpiry, isSessionExpired } from "../domain/auth-domain"
 import {
@@ -9,6 +10,7 @@ import {
 } from "../infrastructure/sessions-model.server"
 
 const SESSION_KEY = "sessionId"
+const { NODE_ENV: mode, SESSION_SECRET: sessionSecret } = getServerEnv()
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -16,8 +18,8 @@ export const sessionStorage = createCookieSessionStorage({
     name: "__session",
     path: "/",
     sameSite: "lax",
-    secrets: [process.env.SESSION_SECRET ?? "default-secret"],
-    secure: process.env.NODE_ENV === "production",
+    secrets: [sessionSecret],
+    secure: mode === "production",
   },
 })
 

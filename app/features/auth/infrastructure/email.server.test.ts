@@ -66,8 +66,11 @@ describe("sendVerificationEmail()", () => {
   })
 
   test("given: production without Resend configured, should: log an error without logging the code", async () => {
+    vi.stubEnv("APP_URL", "https://app.example.com")
+    vi.stubEnv("DATABASE_URL", "file:./prisma/prod.db")
     vi.stubEnv("NODE_ENV", "production")
     vi.stubEnv("RESEND_API_KEY", "")
+    vi.stubEnv("SESSION_SECRET", "test-production-session-secret")
     vi.resetModules()
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined)
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined)

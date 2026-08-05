@@ -1,6 +1,7 @@
 import { data } from "react-router"
 
 import type { Route } from "./+types/index"
+import { getServerEnv } from "~/config/server-env.server"
 import {
   getUserId,
   requireUserId,
@@ -66,6 +67,7 @@ const calculateRemainingResendCooldownSeconds = ({
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const env = getServerEnv()
   const userId = await getUserId(request)
   if (!userId) return { isLanding: true as const, pageTitle: "Todo Demo" }
 
@@ -114,7 +116,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         user &&
           isOwnerEmailAllowed(
             user.email,
-            parseOwnerEmailAllowlist(process.env.OWNER_EMAIL_ALLOWLIST),
+            parseOwnerEmailAllowlist(env.OWNER_EMAIL_ALLOWLIST),
           ),
       ),
     chatUnreadCount,

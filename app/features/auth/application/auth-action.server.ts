@@ -1,6 +1,7 @@
 import { data, redirect } from "react-router"
 import { match } from "ts-pattern"
 
+import { getServerEnv } from "../../../config/server-env.server"
 import {
   SEND_MAGIC_LINK_INTENT,
   VERIFICATION_EXPIRY_MINUTES,
@@ -64,7 +65,7 @@ export const authAction = async ({ request }: { request: Request }) => {
         type: VERIFICATION_TYPE_LOGIN,
       })
 
-      const baseUrl = process.env.APP_URL || new URL(request.url).origin
+      const baseUrl = getServerEnv().APP_URL || new URL(request.url).origin
       const magicLinkUrl = buildMagicLinkUrl({
         baseUrl,
         code: otp,

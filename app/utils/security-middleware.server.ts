@@ -1,6 +1,8 @@
 import { generalSecurity } from "@nichtsam/helmet/general"
 import type { MiddlewareFunction } from "react-router"
 
+import { getServerEnv } from "../config/server-env.server"
+
 export const securityMiddleware: MiddlewareFunction = async (_, next) => {
   const response = (await next()) as Response
 
@@ -8,7 +10,7 @@ export const securityMiddleware: MiddlewareFunction = async (_, next) => {
     referrerPolicy: false,
   })
 
-  const allowIndexing = process.env.ALLOW_INDEXING !== "false"
+  const allowIndexing = getServerEnv().ALLOW_INDEXING
   if (!allowIndexing) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow")
   }

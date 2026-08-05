@@ -1,3 +1,4 @@
+import { getServerEnv } from "../../../config/server-env.server"
 import { CHAT_NOTIFICATION_COOLDOWN_MS } from "../domain/chat-constants"
 import { sendOwnerChatEmail } from "./chat-email.server"
 import {
@@ -14,7 +15,7 @@ export async function notifyOwnerOfChatMessage({
   now = new Date(),
   ownerEmail,
   ownerId,
-  ownerPhone = process.env.OWNER_PHONE_NUMBER,
+  ownerPhone = getServerEnv().OWNER_PHONE_NUMBER,
   senderEmail,
 }: {
   dashboardUrl: string
