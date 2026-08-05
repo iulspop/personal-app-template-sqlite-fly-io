@@ -44,13 +44,15 @@ export const logVerificationEmail = ({
  * @param params - The email recipient, code, and magic link URL.
  */
 export async function sendMagicLinkEmail(params: MagicLinkEmailParams) {
-  if (env.NODE_ENV === "development") logMagicLinkEmail(params)
+  if (env.NODE_ENV === "development") {
+    logMagicLinkEmail(params)
+    return
+  }
 
   if (!resend) {
-    if (env.NODE_ENV !== "development")
-      console.error(
-        "[Auth] RESEND_API_KEY is not configured; email was not sent.",
-      )
+    console.error(
+      "[Auth] RESEND_API_KEY is not configured; email was not sent.",
+    )
     return
   }
 
@@ -71,13 +73,15 @@ export async function sendMagicLinkEmail(params: MagicLinkEmailParams) {
  * @param params - The email recipient, code, and verification URL.
  */
 export async function sendVerificationEmail(params: VerificationEmailParams) {
-  if (env.NODE_ENV === "development") logVerificationEmail(params)
+  if (env.NODE_ENV === "development") {
+    logVerificationEmail(params)
+    return
+  }
 
   if (!resend) {
-    if (env.NODE_ENV !== "development")
-      console.error(
-        "[Auth] RESEND_API_KEY is not configured; email was not sent.",
-      )
+    console.error(
+      "[Auth] RESEND_API_KEY is not configured; email was not sent.",
+    )
     return
   }
 

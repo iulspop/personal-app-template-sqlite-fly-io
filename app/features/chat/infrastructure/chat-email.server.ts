@@ -16,6 +16,8 @@ export async function sendOwnerChatEmail({
   senderEmail: string
 }): Promise<ChatDeliveryResult> {
   const env = getServerEnv()
+  if (env.NODE_ENV === "development")
+    return { delivered: false, errorCode: "EMAIL_DISABLED_IN_DEVELOPMENT" }
   if (!env.RESEND_API_KEY)
     return { delivered: false, errorCode: "EMAIL_NOT_CONFIGURED" }
 
