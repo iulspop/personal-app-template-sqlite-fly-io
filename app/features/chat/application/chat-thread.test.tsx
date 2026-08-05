@@ -63,7 +63,10 @@ const renderChatThread = ({
   action?: () => { error: string | null; messageId?: string }
   draft?: string
 } = {}) => {
-  const store = createStore({ ports: createPorts(), shouldRunSagas: false })
+  const store = createStore({
+    ports: { founderChat: createPorts() },
+    shouldRunSagas: false,
+  })
   if (draft) store.dispatch(restoreChatDraft({ ...identity, draft }))
   const RouterStub = createRoutesStub([
     {

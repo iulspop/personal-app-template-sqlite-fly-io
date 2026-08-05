@@ -1,4 +1,6 @@
+// FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatEnvServerImports
 import { join } from "node:path"
+// FEATURE_SLOT_END:serverEnvExtensions:founderChatEnvServerImports
 
 import type {
   RedactedEnvIssue,
@@ -14,7 +16,9 @@ import {
 
 export type ParsedServerEnv = ServerEnv & {
   ALLOW_INDEXING: boolean
+  // FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatEnvServerType
   CHAT_ATTACHMENT_DIRECTORY: string
+  // FEATURE_SLOT_END:serverEnvExtensions:founderChatEnvServerType
   DATABASE_URL: string
   EMAIL_FROM: string
   NODE_ENV: RuntimeMode
@@ -46,11 +50,13 @@ export function parseServerEnv(
   return {
     ...result.data,
     ALLOW_INDEXING: result.data.ALLOW_INDEXING ?? true,
+    // FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatEnvServerDefaults
     CHAT_ATTACHMENT_DIRECTORY:
       result.data.CHAT_ATTACHMENT_DIRECTORY ??
       (mode === "production"
         ? "/data/chat-attachments"
         : join(process.cwd(), ".data/chat-attachments")),
+    // FEATURE_SLOT_END:serverEnvExtensions:founderChatEnvServerDefaults
     DATABASE_URL: result.data.DATABASE_URL ?? "file:./prisma/dev.db",
     EMAIL_FROM: result.data.EMAIL_FROM ?? "noreply@example.com",
     NODE_ENV: mode,

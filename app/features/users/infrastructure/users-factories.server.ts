@@ -14,7 +14,9 @@ export const createPopulatedUser: Factory<User> = ({
   id = createId(),
   email = faker.internet.email(),
   emailVerifiedAt = faker.date.recent({ days: 10 }),
+  // FEATURE_SLOT_BEGIN:testHelpers:founderChatUserFactoryInput
   lastSeenAt = null,
+  // FEATURE_SLOT_END:testHelpers:founderChatUserFactoryInput
   updatedAt = faker.date.recent({ days: 10 }),
   createdAt = faker.date.past({ refDate: updatedAt, years: 3 }),
 } = {}) => ({
@@ -22,6 +24,8 @@ export const createPopulatedUser: Factory<User> = ({
   email,
   emailVerifiedAt,
   id,
+  // FEATURE_SLOT_BEGIN:testHelpers:founderChatUserFactoryOutput
   lastSeenAt,
+  // FEATURE_SLOT_END:testHelpers:founderChatUserFactoryOutput
   updatedAt,
 })

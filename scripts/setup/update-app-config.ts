@@ -1,9 +1,11 @@
 import type { SetupConfig } from "./setup-config"
 
+type AppIdentitySetupConfig = Omit<SetupConfig, "features">
+
 const appConfigDeclaration =
   /export const appConfig = \{[\s\S]*?\n\} as const satisfies AppConfig\n?/
 
-export function renderAppConfig(config: SetupConfig) {
+export function renderAppConfig(config: AppIdentitySetupConfig) {
   return `export const appConfig = {
   backgroundColor: "#faf9f7",
   description: ${JSON.stringify(config.description)},
@@ -41,7 +43,10 @@ export function renderAppConfig(config: SetupConfig) {
 `
 }
 
-export function updateAppConfigSource(source: string, config: SetupConfig) {
+export function updateAppConfigSource(
+  source: string,
+  config: AppIdentitySetupConfig,
+) {
   const matches = source.match(new RegExp(appConfigDeclaration.source, "g"))
   if (matches?.length !== 1) {
     throw new Error("Expected exactly one canonical appConfig declaration")

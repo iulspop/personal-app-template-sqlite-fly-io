@@ -1,0 +1,12 @@
+{
+  "appName": "Founder Inbox",
+  "description": "Private conversations between users and the founder.",
+  "features": {
+    "founderChat": true,
+    "todos": false
+  },
+  "iconSource": "public/icons/app-icon-source.svg",
+  "locale": "en",
+  "productionUrl": "https://inbox.example.com",
+  "shortName": "Inbox"
+}

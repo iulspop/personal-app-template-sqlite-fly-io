@@ -5,6 +5,7 @@ import { checkApp } from "./doctor/check-app"
 import { checkArchitecture } from "./doctor/check-architecture"
 import { checkDatabases } from "./doctor/check-databases"
 import { checkEnv } from "./doctor/check-env"
+import { checkFeatures } from "./doctor/check-features"
 import { checkIntegrations } from "./doctor/check-integrations"
 import { checkPrisma } from "./doctor/check-prisma"
 import { checkPwa } from "./doctor/check-pwa"
@@ -45,6 +46,7 @@ export async function runDoctor({
     ...checkIntegrations(source),
     ...(await checkDatabases(projectRoot)),
     ...(await checkArchitecture(projectRoot)),
+    ...(await checkFeatures({ projectRoot })),
     ...(await checkPrisma(projectRoot)),
   ]
   return createDoctorReport(findings, args.strict)

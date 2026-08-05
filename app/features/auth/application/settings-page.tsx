@@ -1,10 +1,5 @@
 import { startRegistration } from "@simplewebauthn/browser"
-import {
-  IconBell,
-  IconKey,
-  IconMessageCircle,
-  IconUser,
-} from "@tabler/icons-react"
+import { IconKey, IconUser } from "@tabler/icons-react"
 import { useState } from "react"
 import { Form, Link } from "react-router"
 
@@ -12,6 +7,10 @@ import { AppearanceControl } from "./appearance-control"
 import * as s from "./settings-page.css"
 import { Button } from "~/components/ui/button"
 import { FieldError } from "~/components/ui/field"
+import {
+  SettingsFeatureSectionsComponent,
+  settingsLinks,
+} from "~/composition/generated/settings"
 import { cx } from "~/utils/class-name"
 
 type SettingsActionData =
@@ -72,7 +71,7 @@ export function SettingsPageComponent({
           </p>
         </div>
         <Link className={s.backLink} to="/">
-          Back to todos
+          Back to workspace
         </Link>
       </header>
 
@@ -81,7 +80,11 @@ export function SettingsPageComponent({
           <a href="#appearance">Appearance</a>
           <a href="#account">Account</a>
           <a href="#passkeys">Passkeys</a>
-          <a href="#chat">Founder chat</a>
+          {settingsLinks.map(({ href, label }) => (
+            <a href={href} key={href}>
+              {label}
+            </a>
+          ))}
         </nav>
 
         <div className={s.sections}>
@@ -186,58 +189,11 @@ export function SettingsPageComponent({
             )}
           </section>
 
-          <section className={s.section} id="chat">
-            <div className={s.sectionHeading}>
-              <h2>Founder chat</h2>
-              <p>Role and notification delivery for private conversations.</p>
-            </div>
-            <div className={s.settingRow}>
-              <IconMessageCircle
-                aria-hidden="true"
-                className={s.rowIcon}
-                size={17}
-              />
-              <div className={s.settingCopy}>
-                <span className={s.settingTitle}>Chat role</span>
-                <span className={s.settingDescription}>
-                  Status: {isOwner ? "Owner" : "Regular user"}
-                </span>
-              </div>
-              {isOwner && (
-                <Link className={s.rowLink} to="/owner/chats">
-                  Open chat dashboard
-                </Link>
-              )}
-            </div>
-            {isOwner && (
-              <div className={s.notificationRows}>
-                <div className={s.settingRow}>
-                  <IconBell
-                    aria-hidden="true"
-                    className={s.rowIcon}
-                    size={17}
-                  />
-                  <span className={s.settingTitle}>
-                    Email notifications:{" "}
-                    {chatEmailConfigured ? "Configured" : "Not configured"}
-                  </span>
-                  <span className={s.badge}>
-                    {chatEmailConfigured ? "On" : "Off"}
-                  </span>
-                </div>
-                <div className={s.settingRow}>
-                  <span aria-hidden="true" className={s.rowIconPlaceholder} />
-                  <span className={s.settingTitle}>
-                    SMS notifications:{" "}
-                    {chatSmsConfigured ? "Configured" : "Not configured"}
-                  </span>
-                  <span className={s.badge}>
-                    {chatSmsConfigured ? "On" : "Off"}
-                  </span>
-                </div>
-              </div>
-            )}
-          </section>
+          <SettingsFeatureSectionsComponent
+            chatEmailConfigured={chatEmailConfigured}
+            chatSmsConfigured={chatSmsConfigured}
+            isOwner={isOwner}
+          />
         </div>
       </div>
     </section>

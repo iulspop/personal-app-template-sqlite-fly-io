@@ -1,3 +1,4 @@
+import { featureIntegrationChecks } from "../../app/composition/generated/integration-checks"
 import type { ServerEnvSource } from "../../app/config/server-env"
 import type { DoctorFinding } from "./doctor-types"
 
@@ -10,17 +11,7 @@ function configured(source: ServerEnvSource, names: (keyof ServerEnvSource)[]) {
 export function checkIntegrations(source: ServerEnvSource): DoctorFinding[] {
   const integrations = [
     ["auth-email", ["RESEND_API_KEY", "EMAIL_FROM"], "Resend email"],
-    ["owner-chat", ["OWNER_EMAIL_ALLOWLIST"], "Owner chat allowlist"],
-    [
-      "twilio",
-      [
-        "OWNER_PHONE_NUMBER",
-        "TWILIO_ACCOUNT_SID",
-        "TWILIO_AUTH_TOKEN",
-        "TWILIO_FROM_NUMBER",
-      ],
-      "Twilio SMS",
-    ],
+    ...featureIntegrationChecks,
     ["posthog", ["POSTHOG_API_KEY"], "PostHog"],
     ["sentry", ["SENTRY_DSN"], "Sentry"],
   ] as const

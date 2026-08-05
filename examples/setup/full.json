@@ -1,0 +1,12 @@
+{
+  "appName": "Personal App",
+  "description": "A focused personal workspace for todos and founder conversations.",
+  "features": {
+    "founderChat": true,
+    "todos": true
+  },
+  "iconSource": "public/icons/app-icon-source.svg",
+  "locale": "en",
+  "productionUrl": "https://app.example.com",
+  "shortName": "Personal"
+}

@@ -1,5 +1,7 @@
+// FEATURE_SLOT_BEGIN:testHelpers:todosSeedImports
 import { createPopulatedTodo } from "../app/features/todos/infrastructure/todos-factories.server"
 import { saveTodoToDatabase } from "../app/features/todos/infrastructure/todos-model.server"
+// FEATURE_SLOT_END:testHelpers:todosSeedImports
 import { createPopulatedUser } from "../app/features/users/infrastructure/users-factories.server"
 import { saveUserToDatabase } from "../app/features/users/infrastructure/users-model.server"
 import { prisma } from "../app/utils/db.server"
@@ -9,7 +11,9 @@ async function seed() {
   console.time("🌱 Database has been seeded")
 
   // Clear existing data for idempotent seeding
+  // FEATURE_SLOT_BEGIN:testHelpers:todosSeedCleanup
   await prisma.todo.deleteMany()
+  // FEATURE_SLOT_END:testHelpers:todosSeedCleanup
   await prisma.user.deleteMany()
 
   const demoUsers = [
@@ -27,6 +31,7 @@ async function seed() {
 
   console.timeEnd(`👥 Created ${demoUsers.length} users`)
 
+  // FEATURE_SLOT_BEGIN:testHelpers:todosSeedData
   // Seed demo todos
   console.time("📝 Created demo todos")
 
@@ -59,6 +64,7 @@ async function seed() {
   }
 
   console.timeEnd("📝 Created demo todos")
+  // FEATURE_SLOT_END:testHelpers:todosSeedData
 
   console.timeEnd("🌱 Database has been seeded")
 

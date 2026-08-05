@@ -1,14 +1,7 @@
-import type { Reducer, UnknownAction } from "redux"
 import { combineReducers } from "redux"
 
-import type { ChatWorkflowState } from "../features/chat/application/chat-workflow/chat-workflow-reducer"
-import { chatWorkflowReducer } from "../features/chat/application/chat-workflow/chat-workflow-reducer"
+import { featureReducers } from "~/composition/generated/redux-reducers"
 
-export const rootReducer = combineReducers({
-  chatWorkflow: chatWorkflowReducer as Reducer<
-    ChatWorkflowState,
-    UnknownAction
-  >,
-})
+export const rootReducer = combineReducers(featureReducers)
 
 export type RootState = ReturnType<typeof rootReducer>

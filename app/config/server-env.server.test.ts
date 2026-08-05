@@ -16,9 +16,11 @@ describe("parseServerEnv", () => {
   test("given: development mode, should: preserve existing safe defaults", () => {
     expect(parseServerEnv({}, "development")).toMatchObject({
       ALLOW_INDEXING: true,
+      // FEATURE_SLOT_BEGIN:testHelpers:founderChatEnvServerDefaultsTest
       CHAT_ATTACHMENT_DIRECTORY: expect.stringMatching(
         /\.data\/chat-attachments$/,
       ),
+      // FEATURE_SLOT_END:testHelpers:founderChatEnvServerDefaultsTest
       DATABASE_URL: "file:./prisma/dev.db",
       EMAIL_FROM: "noreply@example.com",
       NODE_ENV: "development",

@@ -18,11 +18,12 @@ import { darkThemeClass, lightThemeClass } from "./design-system/theme.css"
 import "./design-system/global.css"
 
 import { ProgressBarComponent } from "./components/progress-bar"
+import { AuthenticatedFeatureProvidersComponent } from "./composition/generated/authenticated-providers"
+import { loadRootFeatureData } from "./composition/generated/root-loader-extensions"
+import { createClientFeatureEnv } from "./composition/generated/server-env-extensions"
 import { authMiddleware } from "./features/auth/application/auth-middleware.server"
 import { getUserId } from "./features/auth/application/auth-session.server"
-import { ChatNotificationProvider } from "./features/chat/application/chat-notification-provider"
 import * as s from "./root.css"
-import { ChatStoreProviderComponent } from "./store/store-provider"
 import { ClientHintCheck, getHints } from "./utils/client-hints"
 import { getDomainUrl } from "./utils/get-domain-url.server"
 import { getImgSrc } from "./utils/get-img-src"
@@ -34,10 +35,12 @@ export const middleware = [securityMiddleware, authMiddleware]
 export async function loader({ request }: Route.LoaderArgs) {
   const env = getServerEnv()
   const viewerId = await getUserId(request)
+  const featureData = loadRootFeatureData({ viewerId })
 
   return data({
     allowIndexing: env.ALLOW_INDEXING,
     ENV: {
+      ...createClientFeatureEnv(),
       MODE: env.NODE_ENV,
       POSTHOG_API_HOST: env.POSTHOG_API_HOST,
       POSTHOG_API_KEY: env.POSTHOG_API_KEY,
@@ -52,7 +55,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       origin: getDomainUrl(request),
       path: new URL(request.url).pathname,
     },
-    viewerId,
+    ...featureData,
   })
 }
 
@@ -110,9 +113,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           optimizerEndpoint="/api/images"
         >
           {rootData?.viewerId ? (
-            <ChatStoreProviderComponent viewerId={rootData.viewerId}>
-              <ChatNotificationProvider>{children}</ChatNotificationProvider>
-            </ChatStoreProviderComponent>
+            <AuthenticatedFeatureProvidersComponent
+              viewerId={rootData.viewerId}
+            >
+              {children}
+            </AuthenticatedFeatureProvidersComponent>
           ) : (
             children
           )}

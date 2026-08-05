@@ -88,7 +88,9 @@ describe("authAction verify code", () => {
       email: "user@example.com",
       emailVerifiedAt: null,
       id: "existing-user-id",
+      // FEATURE_SLOT_BEGIN:testHelpers:founderChatAuthTestUser
       lastSeenAt: null,
+      // FEATURE_SLOT_END:testHelpers:founderChatAuthTestUser
       updatedAt: new Date("2026-05-30T00:00:00.000Z"),
     })
 

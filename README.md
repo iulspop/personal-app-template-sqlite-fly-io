@@ -88,6 +88,7 @@ Create these secrets/config values in Infisical:
 | `SENTRY_ORG` | Sentry organization slug required for source map uploads | `your-org` |
 | `SENTRY_PROJECT` | Sentry project slug required for source map uploads | `your-project` |
 | `FLY_API_TOKEN` | Fly deploy token for CI deploys | Stored in Infisical `prod` `/web` |
+<!-- FEATURE_SLOT_BEGIN:documentation:founderChatEnvDocs -->
 | `OWNER_EMAIL_ALLOWLIST` | Comma-separated verified emails allowed to claim the sole owner seat | `owner@example.com` |
 | `OWNER_PHONE_NUMBER` | Optional owner SMS notification destination | E.164 number such as `+15551234567` |
 | `TWILIO_ACCOUNT_SID` | Optional Twilio account identifier | `AC...` |
@@ -95,6 +96,7 @@ Create these secrets/config values in Infisical:
 | `TWILIO_FROM_NUMBER` | Optional Twilio sender number | E.164 number |
 
 Twilio is optional. If any SMS value is missing, chat and email notifications continue normally and no SMS delivery is attempted.
+<!-- FEATURE_SLOT_END:documentation:founderChatEnvDocs -->
 
 ### Observability
 
@@ -120,10 +122,21 @@ Run the conservative initializer after cloning:
 ```bash
 pnpm setup
 pnpm setup -- --dry-run
+pnpm setup -- --dry-run --config examples/setup/core-only.json --non-interactive
 pnpm setup -- --config setup.json --non-interactive
 ```
 
-The JSON config uses `appName`, `shortName`, `description`, `locale`, `productionUrl`, and `iconSource`. Setup updates only `app/config/app-config.ts` and the canonical icon source/assets. It previews changes, requires confirmation for interactive writes, never writes secrets, never deploys, and never starts the development server. Configure the printed secret checklist in Infisical `/web` rather than creating `.env` files.
+Setup configures app identity, PWA assets, and optional feature slices. Interactive setup discovers each manifest in `scripts/features/manifests/` and asks whether to retain it. Non-interactive setup requires an explicit boolean for every discovered feature.
+
+Use the four checked-in configs under `examples/setup/` for full, single-feature, and core-only quickstarts. Each file includes the complete identity contract and explicit selections for every currently discovered manifest. Future manifests automatically become required choices in non-interactive configs.
+
+Feature removal is permanent and source-based, not a runtime flag. Setup deletes unselected feature code, routes, manifest-owned migrations, Prisma schema fragments, documentation, test helpers, and dependencies that no retained capability needs. Always run `--dry-run` first. Interactive writes require confirmation; non-interactive writes require the complete `features` object.
+
+Setup refuses schema or migration removal when the development database is non-empty. `--force-feature-removal` bypasses that guard but never deletes `prisma/dev.db`. It also never writes secrets, deploys, or starts the development server. Configure the printed secret checklist in Infisical `/web` rather than creating `.env` files.
+
+If you selected the wrong features, restore the removed files with Git before making unrelated changes, or start again from a fresh template clone. There is no generated-code command that reconstructs a removed feature.
+
+See [Extending optional features](#extending-optional-features) for the manifest contract and source-slot workflow.
 
 Check repository readiness at any time:
 
@@ -173,7 +186,44 @@ app/features/<name>/
 - Application imports domain + infrastructure
 - UI imports domain pure helpers but never model/action files
 
+<!-- FEATURE_SLOT_BEGIN:documentation:todosDocs -->
 The `app/features/todos/` directory is a complete reference implementation of this pattern.
+<!-- FEATURE_SLOT_END:documentation:todosDocs -->
+
+### Extending optional features
+
+Add a future optional slice—such as an AI chat feature—by adding the slice and one declarative `scripts/features/manifests/*-feature.ts` file. Do not add its ID to setup, the planner, doctor, or the combination harness; manifest discovery adds it to those workflows automatically.
+
+A manifest declares:
+
+- identity, description, and default selection
+- feature dependencies and conflicts
+- shared capabilities, such as `clientWorkflows`
+- owned files, routes, documentation, migrations, and environment keys
+- package dependencies and Prisma schema slots
+- exact source-slot contributions and focused verification commands
+
+Use dependencies when one optional feature imports another. Use conflicts when two features cannot coexist. Shared capabilities are reference-counted: capability packages and composition remain until the final feature requiring that capability is removed.
+
+Feature contributions to shared files must use exact markers:
+
+```ts
+// FEATURE_SLOT_BEGIN:primaryNavigation:aiChatNavigation
+// AI chat navigation contribution
+// FEATURE_SLOT_END:primaryNavigation:aiChatNavigation
+```
+
+Prisma fragments use the same exact-slot model in `prisma/schema.prisma`. Documentation may use HTML comments. Each manifest declaration must match exactly one begin/end pair; stale, missing, duplicated, or prefix-matched markers fail setup instead of triggering broad deletion.
+
+Recommended extension workflow:
+
+1. Build the feature under `app/features/<name>/` and keep optional cross-feature imports explicit.
+2. Add routes, Prisma fragments, migrations, environment keys, packages, docs, and tests.
+3. Add source-slot markers around every contribution to shared core files.
+4. Add one manifest under `scripts/features/manifests/` using `parseFeatureManifest()`.
+5. Run `pnpm app:doctor`, `pnpm check:architecture`, and `pnpm test:features`.
+
+`pnpm test:features` derives every valid selection from discovered production manifests. For each selection it creates a temporary project, runs setup, deploys retained migrations to isolated SQLite databases, generates Prisma, checks architecture and types, runs relevant feature tests, and builds. It does not mutate `prisma/dev.db`.
 
 ### Client state and effects
 

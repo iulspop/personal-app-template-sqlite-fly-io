@@ -16,20 +16,22 @@ vi.mock("./chat-workflow/chat-revalidation-bridge", () => ({
 const createTestStore = () =>
   createStore({
     ports: {
-      drafts: {
-        readDraft: () => "",
-        removeDraft: () => undefined,
-        writeDraft: () => undefined,
-      },
-      realtime: {
-        isOnline: () => true,
-        isVisible: () => true,
-        observeOnline: () => () => undefined,
-        observeVisibility: () => () => undefined,
-        openConnection: () => ({ close: () => undefined }),
-        publishPresence: async () => undefined,
-        publishTyping: async () => undefined,
-        wait: async () => undefined,
+      founderChat: {
+        drafts: {
+          readDraft: () => "",
+          removeDraft: () => undefined,
+          writeDraft: () => undefined,
+        },
+        realtime: {
+          isOnline: () => true,
+          isVisible: () => true,
+          observeOnline: () => () => undefined,
+          observeVisibility: () => () => undefined,
+          openConnection: () => ({ close: () => undefined }),
+          publishPresence: async () => undefined,
+          publishTyping: async () => undefined,
+          wait: async () => undefined,
+        },
       },
     },
     shouldRunSagas: false,

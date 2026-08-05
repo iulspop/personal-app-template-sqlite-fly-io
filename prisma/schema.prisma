@@ -11,20 +11,25 @@ model User {
   id                    String             @id @default(cuid())
   email                 String             @unique
   emailVerifiedAt       DateTime?
+  // FEATURE_SLOT_BEGIN:prisma:founderChatUserPresence
   lastSeenAt            DateTime?
+  // FEATURE_SLOT_END:prisma:founderChatUserPresence
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
   connections           Connection[]
   passkeys              Passkey[]
   sessions              Session[]
+  // FEATURE_SLOT_BEGIN:prisma:founderChatUserRelations
   ownerClaim            OwnerClaim?
   ownedConversations    ChatConversation[] @relation("ConversationOwner")
   chatConversation      ChatConversation?  @relation("ConversationUser")
   sentChatMessages      ChatMessage[]      @relation("MessageSender")
   receivedNotifications ChatNotification[] @relation("NotificationRecipient")
   chatTypingStates      ChatTypingState[]
+  // FEATURE_SLOT_END:prisma:founderChatUserRelations
 }
 
+// FEATURE_SLOT_BEGIN:prisma:todosModel
 model Todo {
   id          String   @id @default(cuid())
   title       String
@@ -33,6 +38,8 @@ model Todo {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// FEATURE_SLOT_END:prisma:todosModel
 
 model Session {
   id             String   @id @default(cuid())
@@ -89,6 +96,7 @@ model Passkey {
   @@index([userId])
 }
 
+// FEATURE_SLOT_BEGIN:prisma:founderChatModels
 model OwnerClaim {
   singletonKey Int      @id @default(1)
   userId       String   @unique
@@ -97,16 +105,16 @@ model OwnerClaim {
 }
 
 model ChatConversation {
-  id          String        @id @default(cuid())
-  userId      String        @unique
-  ownerId     String
-  userReadAt  DateTime?
-  ownerReadAt DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  user        User          @relation("ConversationUser", fields: [userId], references: [id], onDelete: Cascade)
-  owner       User          @relation("ConversationOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  messages    ChatMessage[]
+  id           String            @id @default(cuid())
+  userId       String            @unique
+  ownerId      String
+  userReadAt   DateTime?
+  ownerReadAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  user         User              @relation("ConversationUser", fields: [userId], references: [id], onDelete: Cascade)
+  owner        User              @relation("ConversationOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  messages     ChatMessage[]
   typingStates ChatTypingState[]
 
   @@index([ownerId, updatedAt])
@@ -167,3 +175,5 @@ model ChatNotification {
   @@unique([messageId, recipientId, channel])
   @@index([recipientId, attemptedAt])
 }
+
+// FEATURE_SLOT_END:prisma:founderChatModels

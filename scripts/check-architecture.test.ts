@@ -7,6 +7,7 @@ import {
   analyzeArchitecture,
   formatArchitectureViolations,
 } from "./check-architecture"
+import type { FeatureManifest } from "./features/feature-manifest"
 
 const fixtures: string[] = []
 
@@ -126,5 +127,49 @@ describe("architecture analysis", () => {
     ]
 
     expect(actual.map(({ rule }) => rule)).toEqual(expected)
+  })
+
+  test("given an undeclared optional feature import, should reject it", async () => {
+    const root = await createProject({
+      "app/features/alpha/application/alpha.ts":
+        'import { beta } from "~/features/beta/domain/beta-domain"',
+      "app/features/beta/domain/beta-domain.ts": "export const beta = true",
+    })
+    const createManifest = ({
+      dependencies = [],
+      id,
+    }: {
+      dependencies?: string[]
+      id: string
+    }): FeatureManifest => ({
+      capabilities: [],
+      checks: [],
+      conflicts: [],
+      defaultEnabled: true,
+      dependencies,
+      description: id,
+      docs: [],
+      envKeys: [],
+      id,
+      migrations: [],
+      name: id,
+      ownedPaths: [`app/features/${id}`],
+      packages: { dependencies: [], devDependencies: [], scripts: [] },
+      prisma: { schemaSlots: [] },
+      routes: [],
+      sourceSlots: [],
+    })
+
+    const actual = await analyzeArchitecture(root, [
+      createManifest({ id: "alpha" }),
+      createManifest({ id: "beta" }),
+    ])
+
+    expect(actual).toContainEqual(
+      expect.objectContaining({
+        imported: "~/features/beta/domain/beta-domain",
+        rule: "undeclared-feature-dependency",
+      }),
+    )
   })
 })

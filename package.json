@@ -100,6 +100,7 @@
     "test:e2e:db:prepare": "rm -f prisma/e2e.db prisma/e2e.db-journal && DATABASE_URL=file:./prisma/e2e.db prisma migrate deploy",
     "test:e2e:secrets": "infisical run --env=dev --path=/web -- pnpm test:e2e",
     "test:e2e:ui": "pnpm test:e2e:db:prepare && E2E_ISOLATED=true DATABASE_URL=file:./prisma/e2e.db APP_URL=http://localhost:5251 pnpm exec playwright test --ui",
+    "test:features": "tsx scripts/test-feature-combinations.ts",
     "test:pwa": "pnpm build && pnpm test:e2e:db:prepare && pnpm exec playwright test --config=playwright.pwa.config.ts",
     "test:secrets": "infisical run --env=dev --path=/web -- pnpm test",
     "test:watch": "pnpm test:db:prepare && DATABASE_URL=file:./prisma/test.db vitest",

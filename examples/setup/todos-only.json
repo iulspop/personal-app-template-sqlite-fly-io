@@ -1,0 +1,12 @@
+{
+  "appName": "Todo Workspace",
+  "description": "A focused personal workspace for managing todos.",
+  "features": {
+    "founderChat": false,
+    "todos": true
+  },
+  "iconSource": "public/icons/app-icon-source.svg",
+  "locale": "en",
+  "productionUrl": "https://todos.example.com",
+  "shortName": "Todos"
+}

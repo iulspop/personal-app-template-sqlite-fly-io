@@ -44,10 +44,9 @@ describe("createServerEnvSchema", () => {
     ])
   })
 
-  test("given: optional providers, should: require complete provider configuration", () => {
+  test("given: Resend, should: require sender configuration", () => {
     const result = createServerEnvSchema("development").safeParse({
       RESEND_API_KEY: "resend-secret",
-      TWILIO_ACCOUNT_SID: "twilio-account",
     })
 
     expect(result.success).toBe(false)
@@ -59,6 +58,19 @@ describe("createServerEnvSchema", () => {
         message: "Required when Resend is configured",
         path: "EMAIL_FROM",
       },
+    ])
+  })
+
+  // FEATURE_SLOT_BEGIN:testHelpers:founderChatTwilioEnvTest
+  test("given: partial Twilio configuration, should: require every credential", () => {
+    const result = createServerEnvSchema("development").safeParse({
+      TWILIO_ACCOUNT_SID: "twilio-account",
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(redactEnvIssues(result.error)).toEqual([
       {
         code: "custom",
         message: "Required when Twilio is partially configured",
@@ -71,6 +83,7 @@ describe("createServerEnvSchema", () => {
       },
     ])
   })
+  // FEATURE_SLOT_END:testHelpers:founderChatTwilioEnvTest
 
   test("given: invalid secret-bearing input, should: redact the supplied values", () => {
     const secret = "must-not-appear"
@@ -96,17 +109,25 @@ describe("createServerEnvSchema", () => {
 
   test("given: empty optional values, should: normalize them to undefined", () => {
     const result = createServerEnvSchema("test").parse({
-      OWNER_EMAIL_ALLOWLIST: "  ",
       POSTHOG_API_KEY: "",
       SENTRY_DSN: "",
     })
 
     expect(result).toMatchObject({
-      OWNER_EMAIL_ALLOWLIST: undefined,
       POSTHOG_API_KEY: undefined,
       SENTRY_DSN: undefined,
     })
   })
+
+  // FEATURE_SLOT_BEGIN:testHelpers:founderChatOptionalEnvTest
+  test("given: an empty owner allowlist, should: normalize it to undefined", () => {
+    const result = createServerEnvSchema("test").parse({
+      OWNER_EMAIL_ALLOWLIST: "  ",
+    })
+
+    expect(result.OWNER_EMAIL_ALLOWLIST).toEqual(undefined)
+  })
+  // FEATURE_SLOT_END:testHelpers:founderChatOptionalEnvTest
 })
 
 describe("redactEnvIssues", () => {

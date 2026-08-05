@@ -40,7 +40,7 @@ export function OwnerOnboardingPage({
           <p className={s.body}>Owner setup is unavailable for this account.</p>
         )}
         <Link className={s.backLink} to="/">
-          Back to todos
+          Back to home
         </Link>
       </section>
     </main>

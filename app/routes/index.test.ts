@@ -52,6 +52,7 @@ vi.mock("~/features/auth/infrastructure/passkeys-model.server", () => ({
   retrievePasskeysFromDatabaseByUserId: vi.fn(() => []),
 }))
 
+// FEATURE_SLOT_BEGIN:testHelpers:founderChatIndexMocks
 vi.mock("~/features/chat/infrastructure/chat-model.server", () => ({
   countUnreadMessages: vi.fn(() => 0),
   retrieveOrCreateConversation: vi.fn(() => ({ id: "conversation-id" })),
@@ -59,6 +60,7 @@ vi.mock("~/features/chat/infrastructure/chat-model.server", () => ({
   retrieveOwnerConversationSummaries: vi.fn(() => []),
   retrieveOwnerStatusForUser: vi.fn(() => null),
 }))
+// FEATURE_SLOT_END:testHelpers:founderChatIndexMocks
 
 vi.mock("~/features/users/infrastructure/users-model.server", () => ({
   retrieveUserFromDatabaseById: vi.fn(() => ({
@@ -101,7 +103,20 @@ describe("index loader", () => {
       createRouteArgs(new Request("https://example.com/")),
     )
 
-    expect(loaderData).toEqual({ isLanding: true, pageTitle: "Todo Demo" })
+    const expected = {
+      canClaimOwner: false,
+      chatUnreadCount: 0,
+      hasPasskeys: false,
+      isEmailVerified: false,
+      isLanding: true,
+      isOwner: false,
+      pageTitle: "Todo Demo",
+      resendEmailVerificationCooldownSeconds: 0,
+      userEmail: "",
+    }
+    const actual = loaderData
+
+    expect(actual).toEqual(expected)
     expect(retrieveAllTodosFromDatabase).not.toHaveBeenCalled()
   })
 

@@ -58,6 +58,7 @@ export async function setupTestUser(overrides: { email?: string } = {}) {
   }
 }
 
+// FEATURE_SLOT_BEGIN:testHelpers:founderChatE2eHelpers
 export async function setupChatOwner(email: string) {
   const prisma = createPrisma()
 
@@ -91,7 +92,9 @@ export async function deleteAllChatData() {
     await prisma.$disconnect()
   }
 }
+// FEATURE_SLOT_END:testHelpers:founderChatE2eHelpers
 
+// FEATURE_SLOT_BEGIN:testHelpers:todosE2eHelpers
 /**
  * Deletes all todos from the database.
  * Used to ensure test isolation since todos are not user-scoped.
@@ -105,6 +108,7 @@ export async function deleteAllTodos() {
     await prisma.$disconnect()
   }
 }
+// FEATURE_SLOT_END:testHelpers:todosE2eHelpers
 
 /**
  * Creates a test user + session and sets the session cookie on the page.

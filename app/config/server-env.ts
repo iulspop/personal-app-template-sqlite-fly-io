@@ -46,12 +46,16 @@ const optionalSampleRate = optionalString
 const baseServerEnvSchema = z.object({
   ALLOW_INDEXING: optionalBoolean,
   APP_URL: optionalHttpUrl,
+  // FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatEnvFields
   CHAT_ATTACHMENT_DIRECTORY: optionalString,
+  // FEATURE_SLOT_END:serverEnvExtensions:founderChatEnvFields
   DATABASE_URL: optionalUrl,
   EMAIL_FROM: optionalString,
   NODE_ENV: z.enum(runtimeModes).optional(),
+  // FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatOwnerEnvFields
   OWNER_EMAIL_ALLOWLIST: optionalString,
   OWNER_PHONE_NUMBER: optionalString,
+  // FEATURE_SLOT_END:serverEnvExtensions:founderChatOwnerEnvFields
   POSTHOG_API_HOST: optionalHttpUrl,
   POSTHOG_API_KEY: optionalString,
   RESEND_API_KEY: optionalString,
@@ -63,9 +67,11 @@ const baseServerEnvSchema = z.object({
   SENTRY_RELEASE: optionalString,
   SENTRY_TRACES_SAMPLE_RATE: optionalSampleRate,
   SESSION_SECRET: optionalString,
+  // FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatTwilioFields
   TWILIO_ACCOUNT_SID: optionalString,
   TWILIO_AUTH_TOKEN: optionalString,
   TWILIO_FROM_NUMBER: optionalString,
+  // FEATURE_SLOT_END:serverEnvExtensions:founderChatTwilioFields
 })
 
 export type ServerEnv = z.output<typeof baseServerEnvSchema>
@@ -116,6 +122,7 @@ export function createServerEnvSchema(mode: RuntimeMode) {
       )
     }
 
+    // FEATURE_SLOT_BEGIN:serverEnvExtensions:founderChatTwilioValidation
     const twilioValues = [
       source.TWILIO_ACCOUNT_SID,
       source.TWILIO_AUTH_TOKEN,
@@ -143,6 +150,7 @@ export function createServerEnvSchema(mode: RuntimeMode) {
         }
       }
     }
+    // FEATURE_SLOT_END:serverEnvExtensions:founderChatTwilioValidation
   })
 }
 

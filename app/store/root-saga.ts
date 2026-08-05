@@ -1,9 +1,9 @@
 import type { SagaIterator } from "redux-saga"
 import { all, fork } from "redux-saga/effects"
 
-import { createChatWorkflowSaga } from "../features/chat/application/chat-workflow/chat-workflow-sagas"
-import type { ChatWorkflowPorts } from "../features/chat/domain/chat-workflow-ports"
+import type { FeatureWorkflowPorts } from "~/composition/generated/redux-sagas"
+import { createFeatureSagas } from "~/composition/generated/redux-sagas"
 
-export function* createRootSaga(ports: ChatWorkflowPorts): SagaIterator {
-  yield all([fork(createChatWorkflowSaga, ports)])
+export function* createRootSaga(ports: FeatureWorkflowPorts): SagaIterator {
+  yield all([fork(createFeatureSagas, ports)])
 }

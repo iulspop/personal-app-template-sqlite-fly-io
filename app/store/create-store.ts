@@ -1,15 +1,15 @@
 import { applyMiddleware, legacy_createStore } from "redux"
 import createSagaMiddleware from "redux-saga"
 
-import type { ChatWorkflowPorts } from "../features/chat/domain/chat-workflow-ports"
 import { rootReducer } from "./root-reducer"
 import { createRootSaga } from "./root-saga"
+import type { FeatureWorkflowPorts } from "~/composition/generated/redux-sagas"
 
 export const createStore = ({
   ports,
   shouldRunSagas = typeof window !== "undefined",
 }: {
-  ports: ChatWorkflowPorts
+  ports: FeatureWorkflowPorts
   shouldRunSagas?: boolean
 }) => {
   const sagaMiddleware = createSagaMiddleware()

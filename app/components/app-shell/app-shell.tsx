@@ -1,8 +1,6 @@
 import {
-  IconChecklist,
   IconLogout,
   IconMenu2,
-  IconMessageCircle,
   IconSettings,
   IconSquareCheck,
 } from "@tabler/icons-react"
@@ -12,6 +10,9 @@ import { Form, NavLink } from "react-router"
 import * as s from "./app-shell.css"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
+import { renderAppShellFeatureExtension } from "~/composition/generated/app-shell-extensions"
+import { primaryNavigationItems } from "~/composition/generated/primary-navigation"
+import { appConfig } from "~/config/app-config"
 import { cx } from "~/utils/class-name"
 
 type AppShellProps = {
@@ -29,17 +30,28 @@ function PrimaryNavigation({
   chatUnreadCount = 0,
   isOwner = false,
 }: Pick<AppShellProps, "chatUnreadCount" | "isOwner">) {
+  const context = { chatUnreadCount, isOwner }
+
   return (
     <nav aria-label="Primary navigation" className={s.navigation}>
-      <NavLink className={navClassName} end to="/">
-        <IconChecklist aria-hidden="true" />
-        <span>Todos</span>
-      </NavLink>
-      <NavLink className={navClassName} to={isOwner ? "/owner/chats" : "/chat"}>
-        <IconMessageCircle aria-hidden="true" />
-        <span>{isOwner ? "Chat dashboard" : "Chat with founder"}</span>
-        {chatUnreadCount > 0 ? <Badge>{chatUnreadCount}</Badge> : null}
-      </NavLink>
+      {primaryNavigationItems.map((item) => {
+        const Icon = item.icon
+        const badge = item.badge?.(context) ?? 0
+        const href = item.href(context)
+
+        return (
+          <NavLink
+            className={navClassName}
+            end={href === "/"}
+            key={href}
+            to={href}
+          >
+            <Icon aria-hidden />
+            <span>{item.label(context)}</span>
+            {badge > 0 ? <Badge>{badge}</Badge> : null}
+          </NavLink>
+        )
+      })}
     </nav>
   )
 }
@@ -51,15 +63,25 @@ function AppShell({
   isOwner = false,
   userEmail,
 }: AppShellProps) {
+  const featureExtension = renderAppShellFeatureExtension({
+    canClaimOwner,
+    chatUnreadCount,
+    isOwner,
+  })
+
   return (
     <div className={s.shell}>
       <a className={s.skipLink} href="#main-content">
         Skip to content
       </a>
       <header className={s.header}>
-        <NavLink aria-label="Todo home" className={s.brand} to="/">
+        <NavLink
+          aria-label={`${appConfig.shortName} home`}
+          className={s.brand}
+          to="/"
+        >
           <IconSquareCheck aria-hidden="true" className={s.brandMark} />
-          <span className={s.brandName}>Todo</span>
+          <span className={s.brandName}>{appConfig.shortName}</span>
         </NavLink>
         <div className={s.desktopNavigation}>
           <PrimaryNavigation
@@ -108,11 +130,8 @@ function AppShell({
           </div>
         </details>
       </header>
-      {canClaimOwner ? (
-        <div className={s.ownerPrompt}>
-          <span>Your account can claim the owner chat seat.</span>
-          <NavLink to="/owner/claim">Set up owner access</NavLink>
-        </div>
+      {featureExtension ? (
+        <div className={s.ownerPrompt}>{featureExtension}</div>
       ) : null}
       <main className={s.main} id="main-content">
         {children}

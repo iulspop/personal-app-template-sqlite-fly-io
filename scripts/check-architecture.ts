@@ -1,6 +1,9 @@
-import { readdir, readFile } from "node:fs/promises"
+import { access, readdir, readFile } from "node:fs/promises"
 import { relative, resolve, sep } from "node:path"
 import { pathToFileURL } from "node:url"
+
+import type { FeatureManifest } from "./features/feature-manifest"
+import { loadFeatureManifests } from "./features/load-feature-manifests"
 
 export type ArchitectureViolation = {
   file: string
@@ -78,10 +81,31 @@ function isClientAdapterImport(imported: string) {
   return /\/infrastructure\/[^/]+\.client$/.test(imported)
 }
 
+const manifestFeatureDirectory = (manifest: FeatureManifest) =>
+  manifest.ownedPaths
+    .map((path) => path.match(/^app\/features\/([^/]+)$/)?.[1])
+    .find(Boolean)
+
 export async function analyzeArchitecture(
   projectRoot = process.cwd(),
+  manifests?: FeatureManifest[],
 ): Promise<ArchitectureViolation[]> {
   const featuresRoot = resolve(projectRoot, "app/features")
+  const manifestDirectory = resolve(projectRoot, "scripts/features/manifests")
+  const discoveredManifests =
+    manifests ??
+    ((await access(manifestDirectory).then(
+      () => true,
+      () => false,
+    ))
+      ? await loadFeatureManifests({ directory: manifestDirectory })
+      : [])
+  const manifestsByDirectory = new Map(
+    discoveredManifests.flatMap((manifest) => {
+      const directory = manifestFeatureDirectory(manifest)
+      return directory ? [[directory, manifest] as const] : []
+    }),
+  )
   const files = await listSourceFiles(featuresRoot)
   const violations: ArchitectureViolation[] = []
 
@@ -107,6 +131,27 @@ export async function analyzeArchitecture(
     for (const match of source.matchAll(importPattern)) {
       const imported = match[1]
       if (!imported) continue
+
+      const sourceDirectory = file.match(/^app\/features\/([^/]+)\//)?.[1]
+      const targetDirectory = imported.match(/^~\/features\/([^/]+)\//)?.[1]
+      const sourceManifest = sourceDirectory
+        ? manifestsByDirectory.get(sourceDirectory)
+        : undefined
+      const targetManifest = targetDirectory
+        ? manifestsByDirectory.get(targetDirectory)
+        : undefined
+      if (
+        sourceManifest &&
+        targetManifest &&
+        sourceManifest.id !== targetManifest.id &&
+        !sourceManifest.dependencies.includes(targetManifest.id)
+      )
+        violations.push({
+          file,
+          imported,
+          remediation: `Declare "${targetManifest.id}" in the "${sourceManifest.id}" feature manifest dependencies or remove the cross-feature import.`,
+          rule: "undeclared-feature-dependency",
+        })
 
       if (layer === "domain" && isReduxImport(imported)) {
         violations.push({

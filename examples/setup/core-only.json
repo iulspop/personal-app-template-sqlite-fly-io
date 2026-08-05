@@ -1,0 +1,12 @@
+{
+  "appName": "Personal App",
+  "description": "A secure personal application starter.",
+  "features": {
+    "founderChat": false,
+    "todos": false
+  },
+  "iconSource": "public/icons/app-icon-source.svg",
+  "locale": "en",
+  "productionUrl": "https://app.example.com",
+  "shortName": "Personal"
+}

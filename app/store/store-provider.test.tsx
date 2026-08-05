@@ -1,9 +1,15 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import { expect, test, vi } from "vitest"
 
-import { changeChatDraft } from "../features/chat/application/chat-workflow/chat-workflow-actions"
+import {
+  changeChatDraft,
+  startChatWorkflow,
+} from "../features/chat/application/chat-workflow/chat-workflow-actions"
 import { createStore } from "./create-store"
-import { ChatStoreProviderComponent, useAppSelector } from "./store-provider"
+import {
+  ClientWorkflowStoreProviderComponent,
+  useAppSelector,
+} from "./store-provider"
 
 const ViewerComponent = () => {
   const viewerId = useAppSelector(({ chatWorkflow }) => chatWorkflow.viewerId)
@@ -11,32 +17,37 @@ const ViewerComponent = () => {
   return <span>{viewerId}</span>
 }
 
+const createRealtimePort = () => ({
+  isOnline: () => true,
+  isVisible: () => true,
+  observeOnline: () => () => undefined,
+  observeVisibility: () => () => undefined,
+  openConnection: () => ({ close: () => undefined }),
+  publishPresence: async () => undefined,
+  publishTyping: async () => undefined,
+  wait: async () => undefined,
+})
+
 test("given: an authenticated viewer, should: create isolated workflow state for the provider", () => {
   const store = createStore({
     ports: {
-      drafts: {
-        readDraft: () => "",
-        removeDraft: () => undefined,
-        writeDraft: () => undefined,
-      },
-      realtime: {
-        isOnline: () => true,
-        isVisible: () => true,
-        observeOnline: () => () => undefined,
-        observeVisibility: () => () => undefined,
-        openConnection: () => ({ close: () => undefined }),
-        publishPresence: async () => undefined,
-        publishTyping: async () => undefined,
-        wait: async () => undefined,
+      founderChat: {
+        drafts: {
+          readDraft: () => "",
+          removeDraft: () => undefined,
+          writeDraft: () => undefined,
+        },
+        realtime: createRealtimePort(),
       },
     },
     shouldRunSagas: false,
   })
+  store.dispatch(startChatWorkflow("viewer-1"))
 
   render(
-    <ChatStoreProviderComponent store={store} viewerId="viewer-1">
+    <ClientWorkflowStoreProviderComponent store={store}>
       <ViewerComponent />
-    </ChatStoreProviderComponent>,
+    </ClientWorkflowStoreProviderComponent>,
   )
 
   const actual = screen.getByText("viewer-1").textContent
@@ -49,20 +60,13 @@ test("given: a changed chat draft, should: persist it through the saga port", as
   const writeDraft = vi.fn()
   const store = createStore({
     ports: {
-      drafts: {
-        readDraft: () => "",
-        removeDraft: () => undefined,
-        writeDraft,
-      },
-      realtime: {
-        isOnline: () => true,
-        isVisible: () => true,
-        observeOnline: () => () => undefined,
-        observeVisibility: () => () => undefined,
-        openConnection: () => ({ close: () => undefined }),
-        publishPresence: async () => undefined,
-        publishTyping: async () => undefined,
-        wait: async () => undefined,
+      founderChat: {
+        drafts: {
+          readDraft: () => "",
+          removeDraft: () => undefined,
+          writeDraft,
+        },
+        realtime: createRealtimePort(),
       },
     },
     shouldRunSagas: true,

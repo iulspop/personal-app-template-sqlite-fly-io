@@ -9,6 +9,7 @@ export const doctorCategories = [
   "architecture",
   "prisma",
   "integrations",
+  "features",
 ] as const
 export type DoctorCategory = (typeof doctorCategories)[number]
 

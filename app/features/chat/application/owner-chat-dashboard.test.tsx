@@ -27,7 +27,10 @@ const createPorts = (): ChatWorkflowPorts => ({
 })
 
 test("given: a user is typing, should: show typing in the founder inbox", () => {
-  const store = createStore({ ports: createPorts(), shouldRunSagas: false })
+  const store = createStore({
+    ports: { founderChat: createPorts() },
+    shouldRunSagas: false,
+  })
   store.dispatch(
     receiveChatSnapshot({
       latestAt: null,
