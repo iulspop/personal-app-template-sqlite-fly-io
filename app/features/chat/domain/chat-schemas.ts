@@ -10,6 +10,11 @@ export const chatMessageSchema = z.object({
   body: z.string().trim().max(CHAT_MESSAGE_MAX_LENGTH),
 })
 
+export const chatTypingSchema = z.object({
+  conversationId: z.string().trim().min(1),
+  isTyping: z.enum(["true", "false"]).transform((value) => value === "true"),
+})
+
 export const chatAttachmentSchema = z.object({
   byteSize: z.number().int().positive().max(CHAT_ATTACHMENT_MAX_BYTES),
   mimeType: z.enum(CHAT_ATTACHMENT_MIME_TYPES),

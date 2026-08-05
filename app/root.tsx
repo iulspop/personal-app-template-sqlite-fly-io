@@ -22,6 +22,7 @@ import { authMiddleware } from "./features/auth/application/auth-middleware.serv
 import { getUserId } from "./features/auth/application/auth-session.server"
 import { ChatNotificationProvider } from "./features/chat/application/chat-notification-provider"
 import * as s from "./root.css"
+import { ChatStoreProviderComponent } from "./store/store-provider"
 import { ClientHintCheck, getHints } from "./utils/client-hints"
 import { getDomainUrl } from "./utils/get-domain-url.server"
 import { getImgSrc } from "./utils/get-img-src"
@@ -32,6 +33,7 @@ export const middleware = [securityMiddleware, authMiddleware]
 
 export async function loader({ request }: Route.LoaderArgs) {
   const env = getServerEnv()
+  const viewerId = await getUserId(request)
 
   return data({
     allowIndexing: env.ALLOW_INDEXING,
@@ -44,12 +46,13 @@ export async function loader({ request }: Route.LoaderArgs) {
       SENTRY_RELEASE: env.SENTRY_RELEASE,
       SENTRY_TRACES_SAMPLE_RATE: env.SENTRY_TRACES_SAMPLE_RATE?.toString(),
     },
-    isAuthenticated: Boolean(await getUserId(request)),
+    isAuthenticated: Boolean(viewerId),
     requestInfo: {
       hints: getHints(request),
       origin: getDomainUrl(request),
       path: new URL(request.url).pathname,
     },
+    viewerId,
   })
 }
 
@@ -106,8 +109,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
           getSrc={getImgSrc}
           optimizerEndpoint="/api/images"
         >
-          {rootData?.isAuthenticated ? (
-            <ChatNotificationProvider>{children}</ChatNotificationProvider>
+          {rootData?.viewerId ? (
+            <ChatStoreProviderComponent viewerId={rootData.viewerId}>
+              <ChatNotificationProvider>{children}</ChatNotificationProvider>
+            </ChatStoreProviderComponent>
           ) : (
             children
           )}

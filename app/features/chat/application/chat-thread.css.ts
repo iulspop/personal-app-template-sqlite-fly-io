@@ -231,6 +231,13 @@ globalStyle(`${empty} strong`, {
   fontWeight: theme.font.weight.semibold,
 })
 
+export const typingStatus = style({
+  color: theme.color.text.muted,
+  fontSize: theme.font.role.metadata,
+  minHeight: theme.font.lineHeight.compact,
+  paddingInline: theme.space[4],
+})
+
 export const composer = style({
   "@media": {
     "(max-width: 40rem)": {

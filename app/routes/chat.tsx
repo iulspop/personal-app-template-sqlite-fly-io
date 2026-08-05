@@ -49,12 +49,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     readerId: userId,
   })
   return {
+    conversationId: conversation.id,
     messages: serializeChatThread({ ...thread, requesterId: userId }),
     ownerAvailable: true as const,
     ownerEmail: ownerClaim.user.email,
     ownerPresence: formatPresence(ownerClaim.user.lastSeenAt),
     pageTitle: "Chat with founder",
     userEmail: user.email,
+    viewerId: userId,
   }
 }
 
@@ -100,10 +102,12 @@ export default function ChatRoute({ loaderData }: Route.ComponentProps) {
     <AppShell userEmail={loaderData.userEmail}>
       <ChatThread
         backTo="/"
+        conversationId={loaderData.conversationId}
         messages={loaderData.messages}
         participant={loaderData.ownerEmail}
         presence={loaderData.ownerPresence}
         title="Chat with founder"
+        viewerId={loaderData.viewerId}
       />
     </AppShell>
   )

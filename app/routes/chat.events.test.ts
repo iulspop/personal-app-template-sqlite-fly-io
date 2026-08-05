@@ -8,8 +8,9 @@ vi.mock("~/features/auth/application/auth-session.server", () => ({
 }))
 vi.mock("~/features/chat/infrastructure/chat-model.server", () => ({
   retrieveChatEventSnapshot: vi.fn(() => ({
-    conversations: [],
-    unreadCount: 0,
+    latestAt: "2026-08-05T10:00:00.000Z",
+    typingConversationIds: ["conversation-id"],
+    unreadCount: 2,
   })),
 }))
 
@@ -35,9 +36,11 @@ describe("chat events loader", () => {
     )
     const reader = actual.body?.getReader()
     const firstChunk = await reader?.read()
-    expect(new TextDecoder().decode(firstChunk?.value)).toContain(
-      "event: snapshot",
-    )
+    const snapshot = new TextDecoder().decode(firstChunk?.value)
+    expect(snapshot).toContain("event: snapshot")
+    expect(snapshot).toContain('"typingConversationIds":["conversation-id"]')
+    expect(snapshot).not.toContain("message")
+    expect(snapshot).not.toContain("participant")
     controller.abort()
     await reader?.cancel()
   })

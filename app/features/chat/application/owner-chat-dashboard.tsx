@@ -6,7 +6,9 @@ import {
 import { Link } from "react-router"
 
 import { formatPresence } from "../domain/chat-domain"
+import { selectChatTypingConversationIds } from "./chat-workflow/chat-workflow-selectors"
 import * as s from "./owner-chat-dashboard.css"
+import { useAppSelector } from "~/store/store-provider"
 
 export type OwnerConversationSummary = {
   id: string
@@ -20,6 +22,8 @@ export function OwnerChatDashboard({
 }: {
   conversations: OwnerConversationSummary[]
 }) {
+  const typingConversationIds = useAppSelector(selectChatTypingConversationIds)
+
   return (
     <section aria-labelledby="owner-inbox-title" className={s.page}>
       <header className={s.header}>
@@ -73,7 +77,9 @@ export function OwnerChatDashboard({
                     </span>
                     <span className={s.conversationBottomline}>
                       <span className={s.preview}>
-                        {conversation.latestMessage?.body || "Attachment"}
+                        {typingConversationIds.includes(conversation.id)
+                          ? "Typing…"
+                          : conversation.latestMessage?.body || "Attachment"}
                       </span>
                       <span className={s.presence}>{presence}</span>
                     </span>

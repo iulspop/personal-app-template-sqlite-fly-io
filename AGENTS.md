@@ -158,6 +158,49 @@ TypeConstraints {
   When using server/database return types: Awaited<ReturnType<typeof serverFunction>>, wrap with NonNullable<> if guaranteed to exist.
 }
 
+## Client State and Effects
+
+Use vanilla Redux, React Redux, and Redux Saga only when a client-owned workflow needs meaningful orchestration. Do not add Redux to features that React Router, the URL, or local component state already model clearly.
+
+StateOwnership {
+  React Router loaders/actions own canonical server data, mutations, sessions, database state, and request-driven errors.
+  The URL owns shareable navigation state such as filters, search, pagination, and selected resources.
+  Component state owns local form input, disclosure, focus, and short-lived visual interaction state.
+  Redux owns cross-component client state, durable drafts, realtime connection state, optimistic delivery queues, and coordinated background workflows.
+  Founder chat Redux state is limited to connection, draft, typing, presence-coordination, and notification workflow data; messages, conversations, read state, and mutations remain React Router/server-owned.
+  Never mirror loader data into Redux or use sagas as a generic replacement for React Router requests.
+}
+
+ReduxConstraints {
+  Use `redux`, `react-redux`, and `redux-saga`; do not introduce Redux Toolkit, RTK Query, thunks, listener middleware, or Immer reducers unless explicitly requested.
+  Build the store with `legacy_createStore`, `combineReducers`, and Saga middleware only.
+  Organize Redux code by feature, colocated with the workflow it supports.
+  Use explicit action types, typed action creators, pure reducers, selectors, sagas, ports, and adapters.
+  Keep reducers total, deterministic, synchronous, immutable, and free of effects.
+  Derive state through selectors instead of storing duplicated or computable values.
+  Model actions as facts or user/system intents; keep payloads serializable and minimal.
+  Represent async state explicitly with discriminated unions instead of loosely related booleans.
+}
+
+SagaConstraints {
+  Use sagas for orchestration that benefits from cancellation, retries, debouncing, throttling, races, sequencing, or concurrent workflows.
+  Keep sagas declarative: select state, wait for actions, call typed ports, and dispatch results.
+  Push browser, network, timer, storage, and realtime effects behind typed port functions implemented by infrastructure adapters.
+  Follow the boundary flow: component dispatches intent -> action -> saga -> typed port -> adapter.
+  Never call `fetch`, WebSocket, EventSource, localStorage, timers, or browser globals directly from reducers or selectors.
+  Prefer small worker sagas composed by watcher and root sagas; avoid large procedural generator functions.
+  Use `takeLatest` only when stale work should be cancelled, `takeEvery` when every event matters, and explicit `race`/cancellation for lifecycle-bound work.
+  Test reducers and selectors as pure functions. Test sagas by asserting yielded effects and adapter interactions without real IO.
+}
+
+FunctionalStatePrinciples {
+  Treat state as immutable values transformed by pure functions.
+  Separate decisions from execution: pure functions decide what should happen; sagas and adapters perform effects.
+  Keep domain calculations outside sagas so they remain reusable and independently testable.
+  Prefer composition, data transformations, and explicit return values over mutation and hidden control flow.
+  Make effect dependencies parameters or typed ports rather than importing concrete globals into workflow logic.
+}
+
 ## Hexagonal Feature-Slice Architecture
 
 Each feature lives under `app/features/<name>/` with three subdirectories:

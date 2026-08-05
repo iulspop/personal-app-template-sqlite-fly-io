@@ -22,6 +22,7 @@ model User {
   chatConversation      ChatConversation?  @relation("ConversationUser")
   sentChatMessages      ChatMessage[]      @relation("MessageSender")
   receivedNotifications ChatNotification[] @relation("NotificationRecipient")
+  chatTypingStates      ChatTypingState[]
 }
 
 model Todo {
@@ -106,8 +107,22 @@ model ChatConversation {
   user        User          @relation("ConversationUser", fields: [userId], references: [id], onDelete: Cascade)
   owner       User          @relation("ConversationOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   messages    ChatMessage[]
+  typingStates ChatTypingState[]
 
   @@index([ownerId, updatedAt])
+}
+
+model ChatTypingState {
+  conversationId String
+  userId         String
+  expiresAt      DateTime
+  updatedAt      DateTime         @updatedAt
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([expiresAt])
+  @@index([userId, expiresAt])
 }
 
 model ChatMessage {

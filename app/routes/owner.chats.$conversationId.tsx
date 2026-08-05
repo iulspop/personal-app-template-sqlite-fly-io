@@ -40,10 +40,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     readerId: userId,
   })
   return {
+    conversationId: params.conversationId,
     messages: serializeChatThread({ ...thread, requesterId: userId }),
     pageTitle: `Chat with ${thread.conversation.user.email}`,
     participantEmail: thread.conversation.user.email,
     participantPresence: formatPresence(thread.conversation.user.lastSeenAt),
+    viewerId: userId,
   }
 }
 
@@ -66,11 +68,14 @@ export default function OwnerConversationRoute({
     <main className={layout.workspace}>
       <ChatThread
         backTo="/owner/chats"
+        conversationId={loaderData.conversationId}
         messages={loaderData.messages}
         mobileFullHeight
         participant={loaderData.participantEmail}
         presence={loaderData.participantPresence}
         title="Private conversation"
+        typingLabel={`${loaderData.participantEmail} is typing…`}
+        viewerId={loaderData.viewerId}
       />
     </main>
   )

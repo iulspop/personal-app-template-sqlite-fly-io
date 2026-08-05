@@ -175,6 +175,16 @@ app/features/<name>/
 
 The `app/features/todos/` directory is a complete reference implementation of this pattern.
 
+### Client state and effects
+
+React Router remains authoritative for sessions, database data, route loaders/actions, canonical messages, conversations, read state, and mutations. The URL owns shareable navigation state, while component state owns local visual interactions.
+
+Vanilla Redux, React Redux, and Redux Saga are reserved for client-owned workflows that benefit from orchestration. Founder chat uses Redux only for realtime connection status, per-account/per-conversation drafts, typing indicators, presence coordination, and in-app notifications. Canonical chat messages and loader payloads must never be mirrored into Redux.
+
+Effects follow `component intent -> action -> saga -> typed port -> client adapter`. Reducers and selectors stay pure and immutable; EventSource, fetch, storage, timers, and browser lifecycle APIs remain behind adapters.
+
+Chat drafts are stored in browser `localStorage` under keys scoped by both viewer and conversation, are preserved across navigation and reloads, and clear only after a successful send. Typing state is short-lived server data exposed through participant-scoped SSE snapshots; connection recovery uses bounded backoff and keeps route revalidation—not Redux—as the source of canonical messages.
+
 ## Product UI system
 
 The interface uses a light-first, density-conscious product system built with Vanilla Extract.

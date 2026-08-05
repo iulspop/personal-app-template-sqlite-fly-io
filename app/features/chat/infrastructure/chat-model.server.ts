@@ -209,6 +209,89 @@ export async function retrieveOwnerConversationSummaries(ownerId: string) {
   )
 }
 
+/**
+ * Saves an expiring typing state to the database.
+ * @param input - Conversation, participant, and expiry values.
+ * @returns The saved chat typing state.
+ */
+export function saveChatTypingStateToDatabase({
+  conversationId,
+  expiresAt,
+  userId,
+}: {
+  conversationId: string
+  expiresAt: Date
+  userId: string
+}) {
+  return prisma.chatTypingState.upsert({
+    create: { conversationId, expiresAt, userId },
+    update: { expiresAt },
+    where: { conversationId_userId: { conversationId, userId } },
+  })
+}
+
+/**
+ * Deletes a participant's typing state from the database.
+ * @param input - Conversation and participant identifiers.
+ * @returns The deleted row count.
+ */
+export function deleteChatTypingStateFromDatabaseByConversationIdAndUserId({
+  conversationId,
+  userId,
+}: {
+  conversationId: string
+  userId: string
+}) {
+  return prisma.chatTypingState.deleteMany({
+    where: { conversationId, userId },
+  })
+}
+
+/**
+ * Retrieves fresh opposite-participant typing states for an authorized requester.
+ * @param input - Conversation, requester, and current time values.
+ * @returns Fresh typing states visible to the requester.
+ */
+export function retrieveChatTypingStatesFromDatabaseByConversationIdAndRequesterId({
+  conversationId,
+  now = new Date(),
+  requesterId,
+}: {
+  conversationId: string
+  now?: Date
+  requesterId: string
+}) {
+  return prisma.chatTypingState.findMany({
+    where: {
+      conversation: {
+        id: conversationId,
+        OR: [{ ownerId: requesterId }, { userId: requesterId }],
+      },
+      expiresAt: { gt: now },
+      userId: { not: requesterId },
+    },
+  })
+}
+
+export function retrieveChatTypingStatesFromDatabaseByRequesterId({
+  now = new Date(),
+  requesterId,
+}: {
+  now?: Date
+  requesterId: string
+}) {
+  return prisma.chatTypingState.findMany({
+    select: { conversationId: true },
+    where: {
+      conversation: {
+        OR: [{ ownerId: requesterId }, { userId: requesterId }],
+      },
+      expiresAt: { gt: now },
+      userId: { not: requesterId },
+    },
+  })
+}
+
 export function updateUserPresence(userId: string, lastSeenAt = new Date()) {
   return prisma.user.update({ data: { lastSeenAt }, where: { id: userId } })
 }
@@ -235,11 +318,17 @@ export function retrieveRecentChatNotification({
 }
 
 export async function retrieveChatEventSnapshot(userId: string) {
+  const typingConversationIds = (
+    await retrieveChatTypingStatesFromDatabaseByRequesterId({
+      requesterId: userId,
+    })
+  ).map(({ conversationId }) => conversationId)
   const ownerClaim = await retrieveOwnerStatusForUser(userId)
   if (ownerClaim) {
     const conversations = await retrieveOwnerConversationSummaries(userId)
     return {
       latestAt: conversations[0]?.updatedAt.toISOString() ?? null,
+      typingConversationIds,
       unreadCount: conversations.reduce(
         (total, conversation) => total + conversation.unreadCount,
         0,
@@ -251,9 +340,11 @@ export async function retrieveChatEventSnapshot(userId: string) {
     include: { messages: { orderBy: { createdAt: "desc" }, take: 1 } },
     where: { userId },
   })
-  if (!conversation) return { latestAt: null, unreadCount: 0 }
+  if (!conversation)
+    return { latestAt: null, typingConversationIds, unreadCount: 0 }
   return {
     latestAt: conversation.messages[0]?.createdAt.toISOString() ?? null,
+    typingConversationIds,
     unreadCount:
       (await countUnreadMessages({
         conversationId: conversation.id,

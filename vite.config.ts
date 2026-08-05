@@ -21,6 +21,9 @@ export default async function viteConfig(config: ConfigEnv) {
   }
 
   return {
+    optimizeDeps: {
+      include: ["react-redux", "redux", "redux-saga", "redux-saga/effects"],
+    },
     plugins: [
       vanillaExtractPlugin(),
       !process.env.VITEST && !process.env.STORYBOOK && reactRouter(),

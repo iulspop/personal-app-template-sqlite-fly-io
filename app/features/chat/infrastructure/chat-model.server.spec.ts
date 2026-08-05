@@ -4,11 +4,14 @@ import {
   claimOwnerSeat,
   countUnreadMessages,
   createChatMessage,
+  deleteChatTypingStateFromDatabaseByConversationIdAndUserId,
   markConversationRead,
+  retrieveChatTypingStatesFromDatabaseByConversationIdAndRequesterId,
   retrieveConversationForParticipant,
   retrieveConversationMessages,
   retrieveOrCreateConversation,
   retrieveOwnerConversationSummaries,
+  saveChatTypingStateToDatabase,
   updateUserPresence,
 } from "./chat-model.server"
 import { prisma } from "~/utils/db.server"
@@ -30,6 +33,7 @@ async function createConversation() {
 }
 
 async function cleanChatDatabase() {
+  await prisma.chatTypingState.deleteMany()
   await prisma.chatNotification.deleteMany()
   await prisma.chatAttachment.deleteMany()
   await prisma.chatMessage.deleteMany()
@@ -145,6 +149,70 @@ describe("messages and read state", () => {
     expect(actual).toHaveLength(1)
     expect(actual[0]?.latestMessage?.body).toEqual("Need help")
     expect(actual[0]?.unreadCount).toEqual(1)
+  })
+})
+
+describe("typing state", () => {
+  test("given: an active participant, should: expose only fresh opposite-participant typing", async () => {
+    const { conversation, owner, user } = await createConversation()
+    await saveChatTypingStateToDatabase({
+      conversationId: conversation.id,
+      expiresAt: new Date("2026-08-05T10:00:10.000Z"),
+      userId: user.id,
+    })
+
+    const actual =
+      await retrieveChatTypingStatesFromDatabaseByConversationIdAndRequesterId({
+        conversationId: conversation.id,
+        now: new Date("2026-08-05T10:00:00.000Z"),
+        requesterId: owner.id,
+      })
+    const expected = [user.id]
+
+    expect(actual.map(({ userId }) => userId)).toEqual(expected)
+  })
+
+  test("given: expired typing and an outsider, should: expose no typing state", async () => {
+    const { conversation, user } = await createConversation()
+    const outsider = await createUser("typing-outsider")
+    await saveChatTypingStateToDatabase({
+      conversationId: conversation.id,
+      expiresAt: new Date("2026-08-05T09:59:59.000Z"),
+      userId: user.id,
+    })
+
+    const actual =
+      await retrieveChatTypingStatesFromDatabaseByConversationIdAndRequesterId({
+        conversationId: conversation.id,
+        now: new Date("2026-08-05T10:00:00.000Z"),
+        requesterId: outsider.id,
+      })
+    const expected: never[] = []
+
+    expect(actual).toEqual(expected)
+  })
+
+  test("given: typing was stopped, should: remove the persisted state", async () => {
+    const { conversation, owner, user } = await createConversation()
+    await saveChatTypingStateToDatabase({
+      conversationId: conversation.id,
+      expiresAt: new Date("2026-08-05T10:00:10.000Z"),
+      userId: user.id,
+    })
+    await deleteChatTypingStateFromDatabaseByConversationIdAndUserId({
+      conversationId: conversation.id,
+      userId: user.id,
+    })
+
+    const actual =
+      await retrieveChatTypingStatesFromDatabaseByConversationIdAndRequesterId({
+        conversationId: conversation.id,
+        now: new Date("2026-08-05T10:00:00.000Z"),
+        requesterId: owner.id,
+      })
+    const expected: never[] = []
+
+    expect(actual).toEqual(expected)
   })
 })
 

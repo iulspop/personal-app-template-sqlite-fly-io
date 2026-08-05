@@ -81,6 +81,7 @@ export async function deleteAllChatData() {
   const prisma = createPrisma()
 
   try {
+    await prisma.chatTypingState.deleteMany()
     await prisma.chatNotification.deleteMany()
     await prisma.chatAttachment.deleteMany()
     await prisma.chatMessage.deleteMany()

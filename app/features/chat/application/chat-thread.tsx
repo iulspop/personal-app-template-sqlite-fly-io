@@ -5,14 +5,26 @@ import {
   IconSend,
   IconX,
 } from "@tabler/icons-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useFetcher } from "react-router"
 
 import * as s from "./chat-thread.css"
-import { useChatEvents } from "./use-chat-events"
+import {
+  changeChatDraft,
+  clearChatDraft,
+  closeChatThread,
+  openChatThread,
+  publishChatTyping,
+  stopChatTyping,
+} from "./chat-workflow/chat-workflow-actions"
+import {
+  selectChatDraft,
+  selectChatTypingConversationIds,
+} from "./chat-workflow/chat-workflow-selectors"
 import { Button } from "~/components/ui/button"
 import { Textarea } from "~/components/ui/textarea"
 import { CHAT_SEND_MESSAGE_INTENT } from "~/features/chat/domain/chat-constants"
+import { useAppDispatch, useAppSelector } from "~/store/store-provider"
 
 export type ChatThreadMessage = {
   attachments: Array<{ id: string; originalName: string }>
@@ -25,18 +37,24 @@ export type ChatThreadMessage = {
 
 export function ChatThread({
   backTo,
+  conversationId,
   messages,
   mobileFullHeight = false,
   participant,
   presence,
   title,
+  typingLabel = "Founder is typing…",
+  viewerId,
 }: {
   backTo: string
+  conversationId: string
   messages: ChatThreadMessage[]
   mobileFullHeight?: boolean
   participant: string
   presence: string
   title: string
+  typingLabel?: string
+  viewerId: string
 }) {
   const [announcement, setAnnouncement] = useState("")
   const [selectedFiles, setSelectedFiles] = useState<
@@ -47,14 +65,32 @@ export function ChatThread({
   const messagesRef = useRef<HTMLOListElement>(null)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
   const fetcher = useFetcher<{ error: string | null; messageId?: string }>()
-  useChatEvents(() => setAnnouncement("Conversation updated."))
+  const dispatch = useAppDispatch()
+  const identity = useMemo(
+    () => ({ conversationId, viewerId }),
+    [conversationId, viewerId],
+  )
+  const draft = useAppSelector((state) => selectChatDraft(state, identity))
+  const typingConversationIds = useAppSelector(selectChatTypingConversationIds)
+  const isParticipantTyping = typingConversationIds.includes(conversationId)
+
+  useEffect(() => {
+    dispatch(openChatThread(identity))
+    return () => {
+      dispatch(stopChatTyping(identity))
+      dispatch(closeChatThread(identity))
+    }
+  }, [dispatch, identity])
 
   useEffect(() => {
     if (fetcher.data?.error === null) {
+      dispatch(stopChatTyping(identity))
+      dispatch(clearChatDraft(identity))
       composerRef.current?.reset()
+      setAnnouncement("Message sent.")
       setSelectedFiles([])
     }
-  }, [fetcher.data])
+  }, [dispatch, fetcher.data, identity])
 
   useEffect(() => {
     messagesRef.current?.scrollTo({
@@ -142,6 +178,10 @@ export function ChatThread({
         ))}
       </ol>
 
+      <p aria-live="polite" className={s.typingStatus}>
+        {isParticipantTyping ? typingLabel : ""}
+      </p>
+
       <fetcher.Form
         className={s.composer}
         encType="multipart/form-data"
@@ -197,6 +237,16 @@ export function ChatThread({
           id="chat-message"
           maxLength={4000}
           name="body"
+          onBlur={() => dispatch(stopChatTyping(identity))}
+          onChange={(event) => {
+            const nextDraft = event.currentTarget.value
+            dispatch(changeChatDraft({ ...identity, draft: nextDraft }))
+            dispatch(
+              nextDraft.trim()
+                ? publishChatTyping(identity)
+                : stopChatTyping(identity),
+            )
+          }}
           onKeyDown={(event) => {
             if (
               event.key === "Enter" &&
@@ -209,6 +259,7 @@ export function ChatThread({
           }}
           placeholder="Write a message…"
           rows={1}
+          value={draft}
         />
         <Button
           aria-label="Send message"

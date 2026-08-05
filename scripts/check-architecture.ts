@@ -49,6 +49,35 @@ function isFrameworkImport(imported: string) {
   )
 }
 
+function isReduxImport(imported: string) {
+  return ["react-redux", "redux", "redux-saga"].some(
+    (packageName) =>
+      imported === packageName || imported.startsWith(`${packageName}/`),
+  )
+}
+
+function workflowFileType(file: string) {
+  return file.match(/(?:^|\/)[^/]*-(reducer|sagas|selectors)\.tsx?$/)?.[1]
+}
+
+function directEffectGlobal(source: string) {
+  return [
+    /\bEventSource\b/,
+    /\bfetch\s*\(/,
+    /\blocalStorage\b/,
+    /\bsessionStorage\b/,
+    /\bwindow\b/,
+    /\bdocument\b/,
+    /\bnavigator\b/,
+    /\bsetInterval\s*\(/,
+    /\bsetTimeout\s*\(/,
+  ].find((pattern) => pattern.test(source))
+}
+
+function isClientAdapterImport(imported: string) {
+  return /\/infrastructure\/[^/]+\.client$/.test(imported)
+}
+
 export async function analyzeArchitecture(
   projectRoot = process.cwd(),
 ): Promise<ArchitectureViolation[]> {
@@ -62,11 +91,32 @@ export async function analyzeArchitecture(
 
     const layer = featureLayer(absoluteFile)
     const source = await readFile(absoluteFile, "utf8")
+    const workflowType = workflowFileType(file)
+
+    const directEffect = workflowType ? directEffectGlobal(source) : undefined
+    if (directEffect) {
+      violations.push({
+        file,
+        imported: String(directEffect),
+        remediation:
+          "Move browser, network, storage, and timer effects behind a typed port implemented by a client adapter.",
+        rule: "workflow-direct-effect",
+      })
+    }
+
     for (const match of source.matchAll(importPattern)) {
       const imported = match[1]
       if (!imported) continue
 
-      if (
+      if (layer === "domain" && isReduxImport(imported)) {
+        violations.push({
+          file,
+          imported,
+          remediation:
+            "Keep Redux actions, reducers, selectors, and sagas in the application layer.",
+          rule: "domain-redux-import",
+        })
+      } else if (
         layer === "domain" &&
         (imported.includes("/application/") ||
           imported.includes("/infrastructure/") ||
@@ -88,6 +138,27 @@ export async function analyzeArchitecture(
           remediation:
             "Move shared contracts to domain or pass application-owned values into infrastructure.",
           rule: "infrastructure-dependency",
+        })
+      }
+
+      if (
+        (workflowType === "reducer" || workflowType === "selectors") &&
+        imported.includes("/infrastructure/")
+      ) {
+        violations.push({
+          file,
+          imported,
+          remediation:
+            "Keep reducers and selectors pure; inject infrastructure through sagas and typed domain ports.",
+          rule: "workflow-infrastructure-import",
+        })
+      } else if (isClientAdapterImport(imported)) {
+        violations.push({
+          file,
+          imported,
+          remediation:
+            "Import concrete client adapters only from the store composition boundary.",
+          rule: "client-adapter-composition",
         })
       }
 

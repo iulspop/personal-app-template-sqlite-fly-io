@@ -76,4 +76,55 @@ describe("architecture analysis", () => {
       { imported: "react-router", rule: "domain-dependency" },
     ])
   })
+
+  test("given Redux imports in domain, should reject them", async () => {
+    const root = await createProject({
+      "app/features/chat/domain/chat-domain.ts":
+        'import type { Action } from "redux"\nexport type ChatAction = Action',
+    })
+
+    await expect(analyzeArchitecture(root)).resolves.toMatchObject([
+      { imported: "redux", rule: "domain-redux-import" },
+    ])
+  })
+
+  test("given direct effects in workflow logic, should reject them", async () => {
+    const root = await createProject({
+      "app/features/chat/application/chat-workflow/chat-reducer.ts":
+        'export const reducer = () => localStorage.getItem("draft")',
+      "app/features/chat/application/chat-workflow/chat-sagas.ts":
+        'export function* saga() { yield fetch("/chat/events") }',
+      "app/features/chat/application/chat-workflow/chat-selectors.ts":
+        "export const selectOnline = () => window.navigator.onLine",
+    })
+
+    const actual = await analyzeArchitecture(root)
+    const expected = [
+      "workflow-direct-effect",
+      "workflow-direct-effect",
+      "workflow-direct-effect",
+    ]
+
+    expect(actual.map(({ rule }) => rule)).toEqual(expected)
+  })
+
+  test("given workflow layer boundary violations, should reject them", async () => {
+    const root = await createProject({
+      "app/features/chat/application/chat-thread.tsx":
+        'import { connect } from "../infrastructure/chat-realtime.client"',
+      "app/features/chat/application/chat-workflow/chat-reducer.ts":
+        'import { load } from "../../infrastructure/chat-drafts.client"',
+      "app/features/chat/application/chat-workflow/chat-selectors.ts":
+        'import { connect } from "../../infrastructure/chat-realtime.client"',
+    })
+
+    const actual = await analyzeArchitecture(root)
+    const expected = [
+      "client-adapter-composition",
+      "workflow-infrastructure-import",
+      "workflow-infrastructure-import",
+    ]
+
+    expect(actual.map(({ rule }) => rule)).toEqual(expected)
+  })
 })
